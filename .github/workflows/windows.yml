@@ -1,0 +1,68 @@
+name: Windows VST3
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  build:
+    runs-on: windows-2022
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - name: Rust toolchain
+        shell: pwsh
+        run: |
+          rustup toolchain install stable --profile minimal --component rustfmt --component clippy
+          rustup target add --toolchain stable wasm32-unknown-unknown
+      - name: Rust checks
+        shell: pwsh
+        run: |
+          rustup run stable cargo fmt --all -- --check
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          rustup run stable cargo test --workspace
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          rustup run stable cargo clippy --workspace --all-targets -- -D warnings
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Build native VST3
+        shell: pwsh
+        run: ./scripts/build_plugin.ps1
+      - name: JavaScript and VST3 integration tests
+        shell: pwsh
+        run: |
+          $TestFiles = (Get-ChildItem web/tests/*.test.mjs).FullName
+          node --test $TestFiles
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          ctest --test-dir plugin/build-windows -C Release --output-on-failure
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Build Windows installer
+        shell: pwsh
+        run: ./scripts/package_plugin.ps1 -SkipBuild
+      - name: Install and uninstall verification
+        shell: pwsh
+        run: |
+          $Setup = (Get-ChildItem dist/*-windows-x64-setup.exe).FullName
+          $AppDir = Join-Path $env:RUNNER_TEMP 'neuropolis-installed'
+          $SetupLog = Join-Path $env:RUNNER_TEMP 'neuropolis-setup.log'
+          $Process = Start-Process $Setup -ArgumentList @('/VERYSILENT','/SUPPRESSMSGBOXES','/NORESTART','/SP-',"/DIR=$AppDir","/LOG=$SetupLog") -PassThru -Wait
+          if ($Process.ExitCode -ne 0) { throw "Setup failed: $($Process.ExitCode)" }
+          $Installed = Join-Path $env:CommonProgramFiles 'VST3/neuropolis.vst3/Contents/x86_64-win/neuropolis.vst3'
+          $Built = 'plugin/build-windows/Neuropolis_artefacts/Release/VST3/neuropolis.vst3/Contents/x86_64-win/neuropolis.vst3'
+          if ((Get-FileHash $Installed).Hash -ne (Get-FileHash $Built).Hash) { throw 'Installed VST3 differs from the build' }
+          $Process = Start-Process "$AppDir/unins000.exe" -ArgumentList @('/VERYSILENT','/SUPPRESSMSGBOXES','/NORESTART') -PassThru -Wait
+          if ($Process.ExitCode -ne 0 -or (Test-Path $Installed)) { throw 'Uninstall did not remove the VST3' }
+      - uses: actions/upload-artifact@v4
+        with:
+          name: neuropolis-windows-x64
+          path: |
+            dist/neuropolis-*-windows-x64-setup.exe
+            dist/neuropolis-*-windows-x64-vst3.zip
+            dist/neuropolis-*-windows-x64-*.sha256
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: windows-test-logs
+          path: |
+            plugin/build-windows/Testing/Temporary/
+            ${{ runner.temp }}/neuropolis-setup.log
+          if-no-files-found: ignore
