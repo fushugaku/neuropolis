@@ -1,0 +1,14 @@
+[package]
+name = "neuropolis-plugin"
+description = "Native host-clocked MIDI processor for the neuropolis Audio Unit"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+
+[lib]
+crate-type = ["staticlib", "rlib"]
+
+[dependencies]
+metropolix-core = { path = "../metropolix-core" }

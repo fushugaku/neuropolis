@@ -1,0 +1,22 @@
+{
+  "firmware_sha256": "742b22522255f8367b94d686d92acedb891edde682b8922c1000f0ab3db29304",
+  "unicorn_version": "2.1.4",
+  "quantizer_cases": 62636,
+  "order_traces": 1344,
+  "order_advances_per_trace": 128,
+  "accumulator_traces": 1280,
+  "accumulator_events_per_trace": 64,
+  "order_events": {
+    "16": "set same length",
+    "32": "reset",
+    "64": "reverse direction",
+    "80": "set same direction",
+    "96": "change length to 9-initial_length"
+  },
+  "primitive_functions_stubbed": false,
+  "checksums": {
+    "quantizer.tsv": "d212df62a99fa4c777f0a85a88042b39c708df5d7f3bbe6bf889513efc9de644",
+    "orders.tsv": "88fb6525365022b00e852eb551be7dbab4e4f23d2968fafe93015a8a52c8a5bf",
+    "accumulator.tsv": "d07ad8b694d291eb1e4d5511f62923c7a0c40b4d95da3817a4efbe8b0190d41c"
+  }
+}

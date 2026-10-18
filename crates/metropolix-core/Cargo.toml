@@ -1,0 +1,8 @@
+[package]
+name = "metropolix-core"
+description = "Firmware-verified musical primitives recovered from Metropolix 1.6.5.0"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true

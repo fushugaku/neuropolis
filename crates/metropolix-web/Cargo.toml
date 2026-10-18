@@ -1,0 +1,13 @@
+[package]
+name = "metropolix-web"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+metropolix-core = { path = "../metropolix-core" }

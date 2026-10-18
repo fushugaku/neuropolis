@@ -1,0 +1,335 @@
+{
+  "scales": [
+    {
+      "id": 0,
+      "mask": 2741,
+      "name": "Major"
+    },
+    {
+      "id": 1,
+      "mask": 1709,
+      "name": "Dorian"
+    },
+    {
+      "id": 2,
+      "mask": 1451,
+      "name": "Phrygian"
+    },
+    {
+      "id": 3,
+      "mask": 2773,
+      "name": "Lydian"
+    },
+    {
+      "id": 4,
+      "mask": 1717,
+      "name": "Mixolydian"
+    },
+    {
+      "id": 5,
+      "mask": 1453,
+      "name": "Aeolian"
+    },
+    {
+      "id": 6,
+      "mask": 1387,
+      "name": "Locrian"
+    },
+    {
+      "id": 7,
+      "mask": 2733,
+      "name": "Melodic Min"
+    },
+    {
+      "id": 8,
+      "mask": 1707,
+      "name": "Dorian b2"
+    },
+    {
+      "id": 9,
+      "mask": 2901,
+      "name": "Lydian Aug"
+    },
+    {
+      "id": 10,
+      "mask": 1749,
+      "name": "Lydian Dom"
+    },
+    {
+      "id": 11,
+      "mask": 1461,
+      "name": "Mixlydn b6"
+    },
+    {
+      "id": 12,
+      "mask": 1389,
+      "name": "Aeolian b5"
+    },
+    {
+      "id": 13,
+      "mask": 1371,
+      "name": "Superlocrn"
+    },
+    {
+      "id": 14,
+      "mask": 2477,
+      "name": "Harm Minor"
+    },
+    {
+      "id": 15,
+      "mask": 1643,
+      "name": "Locrn Nat-6"
+    },
+    {
+      "id": 16,
+      "mask": 2869,
+      "name": "Ionian #5"
+    },
+    {
+      "id": 17,
+      "mask": 1741,
+      "name": "Dorian #4"
+    },
+    {
+      "id": 18,
+      "mask": 1459,
+      "name": "Phrygn Dom"
+    },
+    {
+      "id": 19,
+      "mask": 2777,
+      "name": "Lydian #2"
+    },
+    {
+      "id": 20,
+      "mask": 859,
+      "name": "Altered"
+    },
+    {
+      "id": 21,
+      "mask": 661,
+      "name": "Maj Pent"
+    },
+    {
+      "id": 22,
+      "mask": 1193,
+      "name": "Min Pent"
+    },
+    {
+      "id": 23,
+      "mask": 1365,
+      "name": "Whole Tone"
+    },
+    {
+      "id": 24,
+      "mask": 2925,
+      "name": "Whole1/2Dm"
+    },
+    {
+      "id": 25,
+      "mask": 1755,
+      "name": "1/2WholeDm"
+    },
+    {
+      "id": 26,
+      "mask": 1257,
+      "name": "Minor Blues"
+    },
+    {
+      "id": 27,
+      "mask": 4095,
+      "name": "Chromatic"
+    },
+    {
+      "id": 28,
+      "mask": 2483,
+      "name": "Bhairav"
+    },
+    {
+      "id": 29,
+      "mask": 2509,
+      "name": "Hungrn Min"
+    },
+    {
+      "id": 30,
+      "mask": 2257,
+      "name": "Chinese"
+    },
+    {
+      "id": 31,
+      "mask": 397,
+      "name": "Hirajoshi"
+    },
+    {
+      "id": 32,
+      "mask": 1187,
+      "name": "In-Sen"
+    },
+    {
+      "id": 33,
+      "mask": 653,
+      "name": "Kumoi"
+    },
+    {
+      "id": 34,
+      "mask": 395,
+      "name": "Pelog"
+    },
+    {
+      "id": 35,
+      "mask": 145,
+      "name": "Maj"
+    },
+    {
+      "id": 36,
+      "mask": 657,
+      "name": "Maj6"
+    },
+    {
+      "id": 37,
+      "mask": 2193,
+      "name": "Maj7"
+    },
+    {
+      "id": 38,
+      "mask": 2129,
+      "name": "Maj7b5"
+    },
+    {
+      "id": 39,
+      "mask": 2321,
+      "name": "Maj7#5"
+    },
+    {
+      "id": 40,
+      "mask": 1169,
+      "name": "Dom7"
+    },
+    {
+      "id": 41,
+      "mask": 2197,
+      "name": "Maj9"
+    },
+    {
+      "id": 42,
+      "mask": 137,
+      "name": "Min"
+    },
+    {
+      "id": 43,
+      "mask": 649,
+      "name": "Min6"
+    },
+    {
+      "id": 44,
+      "mask": 1161,
+      "name": "Min7"
+    },
+    {
+      "id": 45,
+      "mask": 1097,
+      "name": "Min7b5"
+    },
+    {
+      "id": 46,
+      "mask": 585,
+      "name": "Dim7"
+    },
+    {
+      "id": 47,
+      "mask": 1165,
+      "name": "Min9"
+    },
+    {
+      "id": 48,
+      "mask": 1197,
+      "name": "Min11"
+    }
+  ],
+  "orders": [
+    {
+      "id": 0,
+      "name": "Linear"
+    },
+    {
+      "id": 1,
+      "name": "Ping Pong"
+    },
+    {
+      "id": 2,
+      "name": "Pendulum"
+    },
+    {
+      "id": 3,
+      "name": "Odd/Even"
+    },
+    {
+      "id": 4,
+      "name": "Jump by 2"
+    },
+    {
+      "id": 5,
+      "name": "Jump by 3"
+    },
+    {
+      "id": 6,
+      "name": "Jump by 4"
+    },
+    {
+      "id": 7,
+      "name": "Jump by 5"
+    },
+    {
+      "id": 8,
+      "name": "Hopscotch"
+    },
+    {
+      "id": 9,
+      "name": "Arp 3...-1"
+    },
+    {
+      "id": 10,
+      "name": "Arp 4...-2"
+    },
+    {
+      "id": 11,
+      "name": "Arp 4...-1"
+    },
+    {
+      "id": 12,
+      "name": "Converge"
+    },
+    {
+      "id": 13,
+      "name": "Diverge"
+    },
+    {
+      "id": 14,
+      "name": "Growing"
+    },
+    {
+      "id": 15,
+      "name": "Shrinking"
+    },
+    {
+      "id": 16,
+      "name": "Pedal Point"
+    },
+    {
+      "id": 17,
+      "name": "Brownian"
+    },
+    {
+      "id": 18,
+      "name": "Shuffle"
+    },
+    {
+      "id": 19,
+      "name": "Quasi Random"
+    },
+    {
+      "id": 20,
+      "name": "Random"
+    }
+  ]
+}
