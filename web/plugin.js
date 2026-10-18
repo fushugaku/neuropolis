@@ -230,10 +230,10 @@ export class PluginRuntime extends Runtime {
     return this.audio.context;
   }
   async toggle() {
-    this.notify("Транспорт управляется DAW");
+    this.notify("Transport is controlled by your DAW");
   }
   async start() {
-    this.notify("Запусти воспроизведение в DAW");
+    this.notify("Start playback in your DAW");
   }
   stop() {}
   pump() {}

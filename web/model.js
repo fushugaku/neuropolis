@@ -514,7 +514,7 @@ export function migratePatch(input) {
   p.name = input.name;
   p.tempo = input.tempo;
   if (!Array.isArray(input.tracks) || input.tracks.length !== 2)
-    throw Error("Нужны два трека");
+    throw Error("Legacy patterns must contain two tracks");
   input.tracks.forEach((old, i) => {
     const t = p.tracks[i];
     Object.assign(t, old);

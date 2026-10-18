@@ -44,7 +44,7 @@ export class InstrumentStore {
       this.error = "";
     } catch {
       this.error =
-        "Не удалось сохранить: память браузера заполнена. Экспортируй backup.";
+        "Could not save: browser storage is full. Export a backup.";
     }
   }
   undo() {
@@ -163,7 +163,7 @@ export class InstrumentStore {
   replace(patch) {
     patch = migratePatch(patch);
     if (!validatePatch(patch))
-      throw Error("Файл не содержит паттерн neuropolis");
+      throw Error("The file does not contain a neuropolis pattern");
     this.remember();
     this.session.patch = patch;
     this.session.currentPreset = -1;
@@ -193,7 +193,7 @@ export class InstrumentStore {
   }
   setChain(chain) {
     if (!validateChain(chain))
-      throw Error("Цепочка содержит некорректные звенья");
+      throw Error("The chain contains invalid links");
     this.remember();
     this.session.chain = structuredClone(chain);
     this.changed();

@@ -1,45 +1,47 @@
-# Возможности и ограничения
+# Features and limitations
 
-## Треки и стадии
+**English** · [Русский](FEATURES.ru.md)
 
-Число треков не ограничено фиксированной константой; практический предел зависит от памяти и производительности компьютера. У каждого трека 16 стадий и собственные Pitch, Pulse Count, Gate Type, настройки и состояние транспорта. Добавление, дублирование и удаление сохраняют позиции оставшихся треков; удаление можно отменить.
+## Tracks and stages
 
-Pulse Count постоянно виден как переключатель 1–8. Gate Type содержит Rest, Single, Multi и Hold. Per-stage редакторы задают pitch/gate override, ratchet, probability, accumulation, CV, slide и skip. Copy/paste, поворот, randomize и morph работают с отдельными стадиями, слоями и треками.
+Tracks are dynamically allocated without a fixed maximum; practical capacity depends on memory and CPU. Each track has 16 stages, independent pitch faders, Pulse Count 1–8, Rest/Single/Multi/Hold gate type, settings and transport position. Add, duplicate and remove preserve other tracks' positions. Removal supports Undo.
 
-## Время и высота
+Pitch/gate override, ratchet, probability, accumulation, CV, slide and skip are editable per stage. Pulse and gate switch positions stay visible on the panel. Copy/paste, rotation, randomize and morph operate on stages, layers and tracks.
 
-21 порядок обхода, оба направления, длина 1–16, offset 0–15, pulse length, Pulse Count Div, clock ÷1…÷64 и ускорения ÷0.5 / ÷0.25. Swing задаётся независимо на трек. Доступны gate length/stretching, ratchet, вероятность на стадию или импульс, slide и Hold.
+## Timing and pitch
 
-Глобальный Reset after повторяет цикл через 1–1024 шестнадцатых; 0 выключает сброс. Он возвращает треки и MOD lanes в начало независимо от их длины и Pulse Count. Темп и транспорт AU/VST3 поступают от DAW.
+21 traversal orders, both directions, length 1–16, offset 0–15, pulse length, Pulse Count Div, clock ÷1…÷64 and accelerations ÷0.5 / ÷0.25. Swing is independent per track. Gate length/stretching, ratchets, stage/pulse probability, slide and Hold are available.
 
-Квантайзер включает 49 заводских и 100 редактируемых пользовательских ладов. У трека есть transpose, диапазон pitch-фейдеров, root, pitch inversion и override стадии.
+Global Reset after repeats after 1–1024 sixteenth notes; 0 turns it off. It resets tracks and MOD lanes independently of their length or Pulse Count. AU/VST3 follow DAW tempo and transport.
 
-## Аккумуляторы
+The quantizer has 49 factory scales and 100 editable user scales. Tracks include transpose, root, pitch-fader range, inversion and per-stage pitch override.
 
-Per stage / Whole track, Stage/Pulse/Ratchet trigger, отдельные положительный и отрицательный пределы, Wrap/Pendulum/Random/Hold, uni/bipolar, reverse/invert/freeze. Помимо прежних Manual/Auto/AUX-режимов, **Accum → Reset → After stages** задаёт независимый период 1–1024 стадии у каждого трека.
+## Accumulators
 
-Одна единица периода — вход в стадию с Pitch/Gate. Pulse Count и ratchet не добавляют единиц. Сброс происходит перед стадией N+1 и повторяется через каждые N стадий. Пропущенные стадии не учитываются; rest, mute и вероятность не останавливают счётчик. Ручной Reset accumulator начинает отсчёт заново.
+Per-stage/whole-track accumulation, Stage/Pulse/Ratchet triggers, separate positive and negative limits, Wrap/Pendulum/Random/Hold, uni/bipolar, reverse/invert/freeze. In addition to Manual/Auto/AUX reset, **Accum → Reset → After stages** gives each track its own 1–1024-stage reset period.
 
-## Модуляция и исполнение
+One entry is entering a stage with Pitch/Gate controls. Pulse Count and ratchet do not increment this counter. Reset occurs before stage N+1 and repeats after every N entries. Skipped stages do not count; rests, mute and probability do not stop advancement. Manual Reset accumulator restarts the counter.
 
-Восемь MOD lanes по 16 стадий: order, length, offset, division, step/ramp, bipolar/unipolar/gates, mute и MIDI CC. Доступны CTRL 1/2, AUX X/Y/Z, Loopy, Stage Player, виртуальные Outputs A/B и MX.
+## Modulation and performance
 
-Виртуальные CV/Gate используются внутри компьютерной модели; физических аналоговых выходов у плагина нет. Browser monitor voices служат прослушиванию. В DAW звук создаёт следующий инструмент; MX выдаёт выбранные MIDI notes или CC.
+Eight 16-stage MOD lanes with order, length, offset, division, step/ramp, bipolar/unipolar/gates, mute and MIDI CC. CTRL 1/2, AUX X/Y/Z, Loopy, Stage Player, virtual Outputs A/B and MX are available.
 
-## Память, MIDI и автоматизация
+Virtual CV/Gate belongs to the computer model; the plugin does not provide physical analog outputs. Browser monitor voices are for auditioning. In the DAW, the downstream instrument generates sound. MX sends the selected MIDI notes or CC.
 
-64 пресета, выборочный recall и pickup, отложенная загрузка, 32 звена цепочки с повторами/mute и восемь памятей цепочек. В нативном плагине очереди и цепочки работают с закрытым редактором и при offline bounce.
+## Memory, MIDI and automation
 
-Каждому треку назначается MIDI-канал. Несколько треков могут отправлять ноты на один канал; Auto распределяет их по 16 каналам по кругу. Число каналов MIDI-порта не ограничивает число внутренних треков. Входящий MIDI плагина передаётся дальше.
+64 presets, selective recall and pickup, deferred loading, 32-link chains with repeat/mute, and eight chain memories. Native queues/chains keep running with the editor closed and during offline bounce.
 
-DAW видит Reset after, Preset, Chain и 32 назначаемых слота Automation Learn. Поддерживаются live edit, Undo/Redo, импорт/экспорт паттерна и полного JSON-backup, экспорт восьми тактов `.mid`. Состояние каждого экземпляра сохраняется в проекте DAW; браузерная сессия хранится отдельно.
+Assign MIDI channels per track. Multiple tracks can share one channel; Auto cycles through 16 channels. The MIDI port's channel count does not limit internal track count. Plugin MIDI input passes through.
 
-## Границы проекта
+DAW automation provides Reset after, Preset, Chain and 32 assignable Learn lanes. Live edit, Undo/Redo, JSON pattern and full-backup import/export and eight-bar `.mid` export are supported. Each plugin instance saves state in the DAW project; browser storage is separate.
 
-- Это расширенная компьютерная модель музыкального секвенсора. Восстановленные примитивы сравниваются с ARM-эталонами; полное побитовое совпадение всей прошивки и её таймингов не заявляется.
-- SysEx и бинарные пресеты аппаратного Metropolix пока не поддерживаются. Используется собственный JSON-формат.
-- ADC/DAC, USB-стек, калибровка и обновление Flash оригинального устройства не эмулируются.
-- AU MIDI FX проверен через auval и отдельный AU-host. VST3 собран; отдельная проверка в другой DAW пока не проведена.
-- Готовый релиз предназначен для macOS Apple Silicon. Пакет пока без Developer ID и notarization.
+## Boundaries
 
-Инструкция по установке и автоматизации: [plugin/README.md](../plugin/README.md).
+- This is an extended computer sequencer. Recovered primitives are compared against stored ARM traces; bit-for-bit equivalence of the whole firmware or all hardware timing is not claimed.
+- Original hardware SysEx and binary presets are not supported. Neuropolis uses its own JSON format.
+- Original ADC/DAC, USB stack, voltage calibration and Flash update are not emulated.
+- AU MIDI FX is macOS-only. VST3 requires a host with VST3 MIDI output routing. Silent integration checks verify the plugin API; DAW-specific routing varies by host.
+- Release binaries target macOS Apple Silicon and Windows x64. Installers are unsigned; the macOS package is not notarized.
+
+[Installation and automation guide](../plugin/README.md).

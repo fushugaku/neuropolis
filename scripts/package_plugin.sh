@@ -91,9 +91,9 @@ ET.SubElement(root, 'welcome', file='welcome.html', **{'mime-type': 'text/html'}
 ET.SubElement(root, 'conclusion', file='conclusion.html', **{'mime-type': 'text/html'})
 outline = ET.SubElement(root, 'choices-outline')
 for choice_id, title, description, package_id, filename in [
-    ('au', 'Audio Unit · Logic Pro', 'AU MIDI FX для Logic Pro. Установка в ~/Library/Audio/Plug-Ins/Components.',
+    ('au', 'Audio Unit · Logic Pro', 'AU MIDI FX for Logic Pro. Installs in ~/Library/Audio/Plug-Ins/Components.',
      'studio.neuropolis.pkg.au', 'neuropolis-AU.pkg'),
-    ('vst3', 'VST3', 'Для DAW с поддержкой VST3 MIDI-выхода. Установка в ~/Library/Audio/Plug-Ins/VST3.',
+    ('vst3', 'VST3', 'For DAWs with VST3 MIDI output support. Installs in ~/Library/Audio/Plug-Ins/VST3.',
      'studio.neuropolis.pkg.vst3', 'neuropolis-VST3.pkg'),
 ]:
     ET.SubElement(outline, 'line', choice=choice_id)

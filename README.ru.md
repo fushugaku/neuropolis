@@ -1,0 +1,104 @@
+[English](README.md) · **Русский**
+
+# neuropolis
+
+MIDI-секвенсор для DAW, вдохновлённый Intellijel Metropolix: независимые треки по 16 стадий, отдельные Pitch / Pulse Count / Gate Type, аккумуляторы, модуляция, пресеты и цепочки.
+
+**[Скачать macOS-установщик](https://github.com/fushugaku/neuropolis/releases/latest)** · [Инструкция для AU / VST3](plugin/README.md) · [Возможности](docs/FEATURES.md)
+
+## Установка
+
+Скачайте `neuropolis-0.2.2-macos-arm64.pkg` из [Releases](https://github.com/fushugaku/neuropolis/releases). Один установщик содержит оба формата; в мастере можно выбрать нужные.
+
+| Платформа | Формат | Назначение |
+| --- | --- | --- |
+| macOS 11+ · Apple Silicon | AU MIDI FX | Logic Pro |
+| macOS 11+ · Apple Silicon | VST3 | DAW с поддержкой MIDI-выхода VST3 |
+
+Плагины устанавливаются для текущего пользователя в `~/Library/Audio/Plug-Ins/Components` и `~/Library/Audio/Plug-Ins/VST3`. После установки переоткройте DAW. Windows x64: используйте `neuropolis-0.2.2-windows-x64-setup.exe` из Releases; он устанавливает VST3 в Program Files/Common Files/VST3 и при необходимости WebView2 Runtime. Для загрузки runtime нужен интернет. Сборок macOS Intel и Linux в релизе нет.
+
+Пакет пока **без Developer ID и Apple notarization**; плагины имеют подпись ad-hoc. macOS может потребовать разрешить открытие пакета в **System Settings → Privacy & Security → Open Anyway**. Контрольные суммы находятся рядом с установщиком в релизе.
+
+## Logic Pro
+
+1. Создайте дорожку Software Instrument.
+2. В слоте **MIDI FX → Audio Units → Neuropolis → neuropolis** откройте секвенсор.
+3. Выберите инструмент на этой же дорожке. Темп и транспорт задаёт Logic.
+
+Секвенсор генерирует MIDI; звук создаёт следующий инструмент. Для записи нот используйте **Record MIDI to Track Here** в меню MIDI FX после neuropolis. Паттерн, пресеты, лады и назначения автоматизации сохраняются в проекте DAW.
+
+### Несколько треков в один тембр
+
+В **Setup → MIDI** назначьте трекам одинаковый **Channel**. Например, треки 1 и 2 с Channel 1 будут играть одним тембром многотембрального инструмента, который слушает канал 1. У каждого трека сохраняются собственные последовательность, длина и скорость.
+
+**Auto** распределяет треки по каналам 1–16 по кругу. Если нужны одновременные ноты, включите полифонию у принимающего инструмента.
+
+## Возможности
+
+- Добавляемые треки без фиксированного предела; по 16 стадий и отдельному набору фейдеров, Pulse Count 1–8 и четырём Gate Type.
+- 21 порядок обхода, длина, направление, offset, swing, ratchet, probability, slide и CV.
+- Clock каждого трека от ÷64 до ÷1, а также **÷0.5** и **÷0.25** для ускорения в 2 и 4 раза.
+- Аккумулятор Per stage / Whole track с пределами, порядком обхода и независимым сбросом через заданное число стадий. Pulse Count и ratchet в этот счётчик не входят.
+- Глобальный **Reset after**: 0–1024 шестнадцатых; 0 отключает периодический сброс.
+- Восемь MOD lanes, CTRL/AUX, Loopy, Stage Player, виртуальные CV/Gate-выходы и MX MIDI.
+- 64 пресета, отложенная загрузка, цепочки до 32 звеньев и восемь памятей цепочек; исполняются с закрытым редактором.
+- 49 заводских и 100 пользовательских ладов; Undo/Redo, копирование, поворот, randomize и morph.
+- 32 назначаемых параметра DAW automation, импорт/экспорт JSON и MIDI-файлов.
+
+Подробности и ограничения: [возможности](docs/FEATURES.md), [AU / VST3](plugin/README.md), [происхождение музыкального ядра](docs/PORTING.md).
+
+## Архитектура
+
+**AU/VST3 исполняют секвенсор нативно в Rust.** JUCE/C++ связывает его с MIDI и транспортом DAW; локальный WebKit отображает редактор. Аудиопоток не зависит от открытого окна или локального веб-сервера. WASM используется отдельной браузерной версией и вспомогательными функциями редактора, включая MIDI-экспорт.
+
+| Каталог | Содержимое |
+| --- | --- |
+| `crates/metropolix-core` | Общее музыкальное ядро Rust, `no_std` + `alloc` |
+| `crates/neuropolis-plugin` | Нативный MIDI-renderer и состояние проекта |
+| `crates/metropolix-web` | WASM ABI браузерного host |
+| `plugin` | Оболочка JUCE, AU/VST3, проверочный AU-host и установщик |
+| `web` | Редактор, браузерный host, модель состояния и тесты |
+| `scripts` | Сборка, упаковка и необязательные инструменты исследования |
+
+## Сборка из исходников
+
+Нужны Rust stable/rustup, Python 3, Node.js и CMake. Для плагинов также нужны macOS и Xcode Command Line Tools. JUCE загружается автоматически из закреплённого commit.
+
+```sh
+git clone https://github.com/fushugaku/neuropolis.git
+cd neuropolis
+rustup target add --toolchain stable wasm32-unknown-unknown thumbv7em-none-eabihf
+
+# Нативные AU и VST3, затем macOS .pkg
+sh scripts/build_plugin.sh
+sh scripts/package_plugin.sh --skip-build
+```
+
+Пакет создаётся в `dist/`. Архитектура соответствует Mac, на котором идёт сборка. Параметры подписи и ограничения описаны в [plugin/README.md](plugin/README.md).
+
+Для браузерной версии:
+
+```sh
+sh scripts/build_web.sh
+sh scripts/run_emulator.sh
+```
+
+Откройте `http://127.0.0.1:8765`. Сервер слушает только этот компьютер. Браузерная версия имеет собственные monitor voices и Web MIDI; её сессия отделена от состояния плагина. Готовая браузерная сборка генерируется в `web/dist/`.
+
+## Проверки
+
+```sh
+sh scripts/check_rust_port.sh
+sh scripts/check_web.sh
+
+# После установки AU на macOS
+auval -v aumi Nplx Npol
+```
+
+Тесты включают ARM-эталоны квантайзера, порядка обхода и аккумулятора, динамические треки, точные MIDI sample offsets, независимость от размера блока, пресеты, цепочки, автоматизацию и миграцию состояния. `NeuropolisCheck` дополнительно проверяет MIDI-выход и состояние через настоящий AU-host. AU проверен через auval; VST3 собран, отдельная проверка в другой DAW пока не проведена.
+
+## Лицензия и происхождение
+
+Код Neuropolis распространяется под **[AGPL-3.0](LICENSE)**. Плагин использует JUCE по его открытой лицензии AGPLv3; сведения о зависимостях находятся в [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md). Релиз также содержит архив соответствующих исходников с закреплённым JUCE SDK.
+
+Это самостоятельный компьютерный проект, не официальный продукт Intellijel. Исследование музыкальных примитивов описано в [PORTING.md](docs/PORTING.md). Оригинальная прошивка, декомпиляция, Ghidra-проекты и локальные логи в репозиторий и релизы не включены. Они не нужны для сборки и запуска. Совместимость с аппаратными SysEx/бинарными пресетами и полная эмуляция платы не заявляются.

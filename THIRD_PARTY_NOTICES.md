@@ -20,9 +20,23 @@ are also provided in `licenses/` and in the installed plugin bundles.
 
 The release source archive includes the complete pinned JUCE source at
 `tools/plugin-sdk/JUCE/`, together with Neuropolis sources and build scripts.
-No proprietary SDK, Apple signing key, or vendor firmware is required to build
-Neuropolis. Apple system frameworks and macOS development tools are supplied by
-Apple separately.
+No Apple signing key or vendor firmware is required for an unsigned build. Apple
+system frameworks and macOS development tools are supplied by Apple separately.
+
+## Microsoft WebView2 (Windows)
+
+Windows builds use Microsoft.Web.WebView2 SDK 1.0.3485.44 from NuGet and statically
+link its WebView2LoaderStatic library. The SDK retains its original Microsoft
+license. Its LICENSE.txt is copied into the Windows plugin's license directory.
+The build script downloads the exact package from the official NuGet feed.
+
+The Windows installer includes Microsoft's signed Evergreen Runtime bootstrapper
+and runs it only if the Runtime is missing. The Runtime is downloaded from
+Microsoft and installed under Microsoft's terms; it is not a part of the Rust
+sequencer or the JUCE source archive.
+
+- SDK: https://www.nuget.org/packages/Microsoft.Web.WebView2/1.0.3485.44
+- Distribution: https://learn.microsoft.com/en-us/microsoft-edge/webview2/concepts/distribution
 
 ## Intellijel Metropolix reference
 

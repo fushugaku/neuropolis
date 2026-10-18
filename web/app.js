@@ -241,7 +241,7 @@ function render() {
   applySolo();
 
   $("#app").innerHTML =
-    `<div class="shell"><header class="topbar"><div class="brand-block"><div class="brand">neuropolis</div></div><div class="transport"><button class="run primary" data-action="play" id="play" ${runtime.hosted ? 'disabled title="Транспорт DAW"' : ""} aria-pressed="${runtime.playing}" aria-label="${runtime.playing ? "Пауза" : "Пуск"}">${icon(runtime.playing ? "pause" : "play")}<span>${runtime.hosted ? "DAW" : runtime.playing ? "PAUSE" : "RUN"}</span></button>${iconButton("reset", "reset", "Сбросить секвенсор")}<label class="tempo"><span>BPM</span><input type="number" min="0.1" max="400" step="0.1" data-path="tempo" value="${p.tempo}" aria-label="Темп BPM" ${runtime.hosted || p.settings.clockSource || p.controls.some((c) => c.destination === 7) ? "disabled" : ""}><span class="tempo-source">${runtime.hosted ? "HOST" : ["INT", "EXT", "MIDI"][p.settings.clockSource]}</span></label><label class="cycle-length" title="Глобальный сброс всех треков. Один шаг — 1/16 ноты. 0 — выключен."><span class="cycle-label">RESET AFTER</span><input type="number" min="0" max="1024" step="1" data-path="totalPulses" value="${p.totalPulses}" aria-label="Шагов до глобального сброса"><span class="cycle-unit">${p.totalPulses ? "STEPS" : "OFF"}</span><i class="cycle-progress" aria-hidden="true"></i></label><div class="clock-display"><span class="timecode mono" id="position" aria-label="Шаг глобального цикла">01 / ${p.totalPulses || "∞"}</span><i class="clock-led" id="clock-led"></i><canvas class="scope" id="scope" width="240" height="60" aria-label="Аудиовыход"></canvas></div></div><div class="top-right"><input class="patch-title" data-path="name" value="${escape(p.name)}" maxlength="80" aria-label="Имя паттерна"><i class="dirty-dot" title="Unsaved changes" ${store.dirty ? "" : "hidden"}></i>${iconButton("undo", "undo", "Отменить", store.undoStack.length ? "" : "disabled", "hide-mobile")}${iconButton("redo", "redo", "Повторить", store.redoStack.length ? "" : "disabled", "hide-mobile")}<i class="separator"></i>${button("quick-save", icon("save") + "Save", `aria-label="Сохранить пресет" ${runtime.chainEnabled || runtime.queued !== null ? "disabled" : ""}`, "save-top")}${menu([["undo", "Undo", `data-mobile-only ${store.undoStack.length ? "" : "disabled"}`], ["redo", "Redo", `data-mobile-only ${store.redoStack.length ? "" : "disabled"}`], ["export-patch", "Export pattern .json"], ["export-backup", "Export full backup .json"], ["import", "Import pattern / backup"], ["export-midi", "Export MIDI · 8 bars"], ["init-patch", "Initialize pattern"], ["load-demo", "Load demo"], ...(localStorage.getItem("metropolix-16-independent-v1") ? [["import-legacy", "Import previous pattern"]] : [])], "File menu")}</div></header><nav class="navigation" aria-label="Редакторы">${[
+    `<div class="shell"><header class="topbar"><div class="brand-block"><div class="brand">neuropolis</div></div><div class="transport"><button class="run primary" data-action="play" id="play" ${runtime.hosted ? 'disabled title="DAW transport"' : ""} aria-pressed="${runtime.playing}" aria-label="${runtime.playing ? "Pause" : "Play"}">${icon(runtime.playing ? "pause" : "play")}<span>${runtime.hosted ? "DAW" : runtime.playing ? "PAUSE" : "RUN"}</span></button>${iconButton("reset", "reset", "Reset sequencer")}<label class="tempo"><span>BPM</span><input type="number" min="0.1" max="400" step="0.1" data-path="tempo" value="${p.tempo}" aria-label="Tempo BPM" ${runtime.hosted || p.settings.clockSource || p.controls.some((c) => c.destination === 7) ? "disabled" : ""}><span class="tempo-source">${runtime.hosted ? "HOST" : ["INT", "EXT", "MIDI"][p.settings.clockSource]}</span></label><label class="cycle-length" title="Reset all tracks after this many sixteenth notes. 0 disables the reset."><span class="cycle-label">RESET AFTER</span><input type="number" min="0" max="1024" step="1" data-path="totalPulses" value="${p.totalPulses}" aria-label="Steps before global reset"><span class="cycle-unit">${p.totalPulses ? "STEPS" : "OFF"}</span><i class="cycle-progress" aria-hidden="true"></i></label><div class="clock-display"><span class="timecode mono" id="position" aria-label="Global cycle step">01 / ${p.totalPulses || "∞"}</span><i class="clock-led" id="clock-led"></i><canvas class="scope" id="scope" width="240" height="60" aria-label="Audio output"></canvas></div></div><div class="top-right"><input class="patch-title" data-path="name" value="${escape(p.name)}" maxlength="80" aria-label="Pattern name"><i class="dirty-dot" title="Unsaved changes" ${store.dirty ? "" : "hidden"}></i>${iconButton("undo", "undo", "Undo", store.undoStack.length ? "" : "disabled", "hide-mobile")}${iconButton("redo", "redo", "Redo", store.redoStack.length ? "" : "disabled", "hide-mobile")}<i class="separator"></i>${button("quick-save", icon("save") + "Save", `aria-label="Save preset" ${runtime.chainEnabled || runtime.queued !== null ? "disabled" : ""}`, "save-top")}${menu([["undo", "Undo", `data-mobile-only ${store.undoStack.length ? "" : "disabled"}`], ["redo", "Redo", `data-mobile-only ${store.redoStack.length ? "" : "disabled"}`], ["export-patch", "Export pattern .json"], ["export-backup", "Export full backup .json"], ["import", "Import pattern / backup"], ["export-midi", "Export MIDI · 8 bars"], ["init-patch", "Initialize pattern"], ["load-demo", "Load demo"], ...(localStorage.getItem("metropolix-16-independent-v1") ? [["import-legacy", "Import previous pattern"]] : [])], "File menu")}</div></header><nav class="navigation" aria-label="Editors">${[
       ["sequence", "Sequence"],
       ["modulation", "Modulation"],
       ["performance", "Performance"],
@@ -294,7 +294,7 @@ const sinkOptions = () => [
 ];
 function sequenceView() {
   return (
-    `<div class="sequence-heading"><span>${store.patch.tracks.length} TRACKS</span>${button("add-track", icon("plus") + "Add track", 'aria-label="Добавить трек"', "ghost")}</div>` +
+    `<div class="sequence-heading"><span>${store.patch.tracks.length} TRACKS</span>${button("add-track", icon("plus") + "Add track", 'aria-label="Add track"', "ghost")}</div>` +
     store.patch.tracks.map((track, i) => trackView(track, i)).join("")
   );
 }
@@ -302,13 +302,13 @@ function chainMuteMenu(link, index) {
   const tracks =
     store.session.presets[link.preset]?.tracks || store.patch.tracks;
   const disabled = runtime.chainEnabled ? "disabled" : "";
-  return `<details class="select chain-mutes align-right"><summary aria-label="Mute звена ${index + 1}">MUTE${icon("down")}</summary><div class="options">${tracks.map((_, i) => button(i < 2 ? "chain-mute" : "chain-mute-track", `Track ${i + 1}`, `data-index="${index}" data-track="${i}" data-bit="${i}" aria-pressed="${chainTrackMuted(link, i)}" aria-label="Mute трек ${i + 1}, звено ${index + 1}" ${disabled}`)).join("")}${button("chain-mute", "MOD", `data-index="${index}" data-bit="2" aria-pressed="${!!(link.mute & 4)}" ${disabled}`)}</div></details>`;
+  return `<details class="select chain-mutes align-right"><summary aria-label="Mute link ${index + 1}">MUTE${icon("down")}</summary><div class="options">${tracks.map((_, i) => button(i < 2 ? "chain-mute" : "chain-mute-track", `Track ${i + 1}`, `data-index="${index}" data-track="${i}" data-bit="${i}" aria-pressed="${chainTrackMuted(link, i)}" aria-label="Mute track ${i + 1}, link ${index + 1}" ${disabled}`)).join("")}${button("chain-mute", "MOD", `data-index="${index}" data-bit="2" aria-pressed="${!!(link.mute & 4)}" ${disabled}`)}</div></details>`;
 }
 function trackView(t, i) {
   const q = { compact: true },
     pre = `tracks.${i}`,
     frame = runtime.lastFrame?.tracks[i];
-  return `<section class="track" data-track="${i}" aria-label="Трек ${i + 1}" style="--accent:${TRACK_COLORS[i % TRACK_COLORS.length][0]};--accent-dim:${TRACK_COLORS[i % TRACK_COLORS.length][1]}"><header class="track-header"><div class="track-identity"><span class="track-index">${String(i + 1).padStart(2, "0")}</span><div class="track-title"><strong>${escape(t.name)}</strong><small>TRACK ${i + 1} · ${runtime.hosted || t.midiChannel ? "CH " + (t.midiChannel || (i % 16) + 1) : "CV"}</small></div></div><div class="track-quick">${control(
+  return `<section class="track" data-track="${i}" aria-label="Track ${i + 1}" style="--accent:${TRACK_COLORS[i % TRACK_COLORS.length][0]};--accent-dim:${TRACK_COLORS[i % TRACK_COLORS.length][1]}"><header class="track-header"><div class="track-identity"><span class="track-index">${String(i + 1).padStart(2, "0")}</span><div class="track-title"><strong>${escape(t.name)}</strong><small>TRACK ${i + 1} · ${runtime.hosted || t.midiChannel ? "CH " + (t.midiChannel || (i % 16) + 1) : "CV"}</small></div></div><div class="track-quick">${control(
     "ORDER",
     `${pre}.order`,
     catalog.orders.map((o) => [o.id, o.name]),
@@ -329,7 +329,7 @@ function trackView(t, i) {
       `÷${n}`,
     ]),
     q,
-  )}${control("SWING", `${pre}.swing`, null, { ...q, min: 50, max: 78, class: "quick-swing" })}</div><div class="track-live"><i class="gate-led" data-gate="${i}"></i><output data-note="${i}">${frame ? noteName(frame.note) : "—"}</output><small data-cv="${i}">${frame ? voltage(frame.cv) : "+0.00"}V</small></div><div class="track-controls"><input class="small-range" type="range" min="0" max="100" value="${t.volume}" data-path="${pre}.volume" aria-label="Громкость трека ${i + 1}"><button class="solo-button" data-action="solo" data-track="${i}" aria-pressed="${view.solo === i}" aria-label="Solo трек ${i + 1}">S</button><button class="mute-button" data-toggle="${pre}.mute" aria-pressed="${!!t.mute}" aria-label="Mute трек ${i + 1}">M</button>${iconButton("track-settings", "settings", `Настройки трека ${i + 1}`, `data-track="${i}"`)}</div></header><div class="bank-scroll" data-scroll="track-${i}"><div class="bank"><div class="row-labels"><span>STAGE</span><span>NOTE</span><span>PITCH</span><div class="row-group pulse-label"><span class="row-heading">PULSE<br>COUNT</span></div><div class="row-group gate-label"><span class="row-heading">GATE<br>TYPE</span><div class="gate-legend" aria-hidden="true"><span>HOLD</span><span>MULTI</span><span>SINGLE</span><span>REST</span></div></div></div>${t.steps.map((s, n) => stageView(t, s, i, n)).join("")}</div></div><div class="lane-toolbar"><div class="lane-tabs" role="tablist" aria-label="Слой трека ${i + 1}">${LANES.map(([key, name]) => button("lane", name, `role="tab" data-track="${i}" data-lane="${key}" aria-selected="${view.lanes[i] === key}"`, view.lanes[i] === key ? "active" : "")).join("")}</div><div class="lane-actions">${iconButton("lane-random", "random", "Randomize layer", `data-track="${i}"`)}${iconButton("lane-morph", "morph", "Morph layer", `data-track="${i}"`, "desktop-only")}${menu(
+  )}${control("SWING", `${pre}.swing`, null, { ...q, min: 50, max: 78, class: "quick-swing" })}</div><div class="track-live"><i class="gate-led" data-gate="${i}"></i><output data-note="${i}">${frame ? noteName(frame.note) : "—"}</output><small data-cv="${i}">${frame ? voltage(frame.cv) : "+0.00"}V</small></div><div class="track-controls"><input class="small-range" type="range" min="0" max="100" value="${t.volume}" data-path="${pre}.volume" aria-label="Track volume ${i + 1}"><button class="solo-button" data-action="solo" data-track="${i}" aria-pressed="${view.solo === i}" aria-label="Solo track ${i + 1}">S</button><button class="mute-button" data-toggle="${pre}.mute" aria-pressed="${!!t.mute}" aria-label="Mute track ${i + 1}">M</button>${iconButton("track-settings", "settings", `Track settings ${i + 1}`, `data-track="${i}"`)}</div></header><div class="bank-scroll" data-scroll="track-${i}"><div class="bank"><div class="row-labels"><span>STAGE</span><span>NOTE</span><span>PITCH</span><div class="row-group pulse-label"><span class="row-heading">PULSE<br>COUNT</span></div><div class="row-group gate-label"><span class="row-heading">GATE<br>TYPE</span><div class="gate-legend" aria-hidden="true"><span>HOLD</span><span>MULTI</span><span>SINGLE</span><span>REST</span></div></div></div>${t.steps.map((s, n) => stageView(t, s, i, n)).join("")}</div></div><div class="lane-toolbar"><div class="lane-tabs" role="tablist" aria-label="Track layer ${i + 1}">${LANES.map(([key, name]) => button("lane", name, `role="tab" data-track="${i}" data-lane="${key}" aria-selected="${view.lanes[i] === key}"`, view.lanes[i] === key ? "active" : "")).join("")}</div><div class="lane-actions">${iconButton("lane-random", "random", "Randomize layer", `data-track="${i}"`)}${iconButton("lane-morph", "morph", "Morph layer", `data-track="${i}"`, "desktop-only")}${menu(
     [
       ["duplicate-track", "Duplicate track", `data-track="${i}"`],
       [
@@ -368,7 +368,7 @@ function stageSwitch(kind, value, track, stage) {
     min = pulse ? 1 : 0,
     max = pulse ? 8 : 3,
     path = `tracks.${track}.steps.${stage}.${kind}`,
-    label = `${pulse ? "Импульсы" : "Gate"}, трек ${track + 1}, стадия ${stage + 1}`,
+    label = `${pulse ? "Pulses" : "Gate"}, track ${track + 1}, stage ${stage + 1}`,
     text = pulse ? `${value} / 8` : GATE_NAMES[value];
   return `<div class="stage-switch ${pulse ? "pulse-count" : "gate-type"}" data-step-switch="${path}"><span class="switch-heading-space" aria-hidden="true"></span><div class="switch-body" data-value="${value}"><span class="switch-rail" aria-hidden="true"></span><div class="switch-scale" aria-hidden="true">${Array.from(
     { length: max - min + 1 },
@@ -405,14 +405,14 @@ function stageView(t, s, i, n) {
   const path = `tracks.${i}.steps.${n}`,
     pickup = store.pickup.get(`pitch:${i}:${n}`),
     pitch = runtime.engine.engine_preview(i, n, 0) / 100;
-  return `<div class="stage ${n >= t.length ? "outside" : ""} ${s.skip ? "skipped" : ""}" data-stage="${n}" data-track="${i}"><button class="stage-head" data-action="stage" data-track="${i}" data-stage="${n}" aria-label="Стадия ${n + 1}, трек ${i + 1}" title="${store.patch.loopy.enabled ? "Loopy / Stage player" : "Audition · Shift: select stage"}">${String(n + 1).padStart(2, "0")}</button><output class="stage-note ${s.pitchOverride >= 0 ? "overridden" : ""}" title="${s.pitchOverride >= 0 ? "Pitch override · PITCH layer" : ""}" data-stage-note="${i}-${n}">${noteName(pitch)}</output><div class="fader" ${pickup ? `data-pickup style="--pickup-top:${(1 - pickup.target / 127) * 116}px"` : ""}><input type="range" min="0" max="127" step="1" value="${pickup?.physical ?? s.pitch}" data-path="${path}.pitch" aria-label="Высота, трек ${i + 1}, стадия ${n + 1}" aria-valuetext="${noteName(pitch)}"></div>${stageSwitch("pulses", s.pulses, i, n)}${stageSwitch("gate", s.gate, i, n)}</div>`;
+  return `<div class="stage ${n >= t.length ? "outside" : ""} ${s.skip ? "skipped" : ""}" data-stage="${n}" data-track="${i}"><button class="stage-head" data-action="stage" data-track="${i}" data-stage="${n}" aria-label="Stage ${n + 1}, track ${i + 1}" title="${store.patch.loopy.enabled ? "Loopy / Stage player" : "Audition · Shift: select stage"}">${String(n + 1).padStart(2, "0")}</button><output class="stage-note ${s.pitchOverride >= 0 ? "overridden" : ""}" title="${s.pitchOverride >= 0 ? "Pitch override · PITCH layer" : ""}" data-stage-note="${i}-${n}">${noteName(pitch)}</output><div class="fader" ${pickup ? `data-pickup style="--pickup-top:${(1 - pickup.target / 127) * 116}px"` : ""}><input type="range" min="0" max="127" step="1" value="${pickup?.physical ?? s.pitch}" data-path="${path}.pitch" aria-label="Pitch, track ${i + 1}, stage ${n + 1}" aria-valuetext="${noteName(pitch)}"></div>${stageSwitch("pulses", s.pulses, i, n)}${stageSwitch("gate", s.gate, i, n)}</div>`;
 }
 function laneEditor(t, i, key) {
   const f = STEP_KEYS.indexOf(key),
     [min, max] = STEP_RANGES[f],
     special = ["slide", "skip"].includes(key),
     label = LANES.find((l) => l[0] === key)?.[1] || key;
-  return `<div class="lane-editor bank-scroll" data-scroll="lane-${i}"><div class="lane-grid"><div class="lane-caption">${label}</div>${t.steps.map((s, n) => `<div class="lane-cell" data-stage="${n}">${special ? `<button class="flag-button" data-toggle="tracks.${i}.steps.${n}.${key}" aria-label="${label}, трек ${i + 1}, стадия ${n + 1}" aria-pressed="${!!s[key]}">${key === "slide" ? "↗" : "×"}</button>` : `<input class="lane-number" type="number" min="${key === "cv" ? (t.cvType === 1 ? 0 : -5) : min}" max="${key === "cv" ? 5 : max}" step="${key === "cv" ? ".01" : "1"}" value="${key === "cv" ? (s.cv / 1000).toFixed(2) : s[key]}" ${key === "cv" ? 'data-factor="1000"' : ""} data-path="tracks.${i}.steps.${n}.${key}" aria-label="${label}, трек ${i + 1}, стадия ${n + 1}">`}${key === "probability" ? button("cycle-sub", s.probabilityTarget ? "PULSE" : "STAGE", `data-track="${i}" data-stage="${n}" data-key="probabilityTarget" data-max="1"`, "lane-mode") : key === "accumulate" ? button("cycle-sub", ["STAGE", "PULSE", "RATCH"][s.accumulateTrigger], `data-track="${i}" data-stage="${n}" data-key="accumulateTrigger" data-max="2"`, "lane-mode") : key === "cv" ? (t.cvType === 2 ? button("cv-gate", s.cvGate ? "GATE ●" : "GATE ○", `data-track="${i}" data-stage="${n}"`, "lane-mode") : button("cycle-sub", ["STEP", "sRAMP", "pRAMP"][s.cvRamp], `data-track="${i}" data-stage="${n}" data-key="cvRamp" data-max="2"`, "lane-mode")) : key === "pitchOverride" ? button("sync-pitch", "SYNC", `data-track="${i}" data-stage="${n}"`, "lane-mode") : key === "gateOverride" ? `<small class="subtle mono" style="font-size:8px">${s.gateOverride < 0 ? "TRACK" : s.gateOverride === 0 ? "REST" : s.gateOverride === 100 ? "HOLD" : s.gateOverride + "%"}</small>` : ""}</div>`).join("")}</div></div>`;
+  return `<div class="lane-editor bank-scroll" data-scroll="lane-${i}"><div class="lane-grid"><div class="lane-caption">${label}</div>${t.steps.map((s, n) => `<div class="lane-cell" data-stage="${n}">${special ? `<button class="flag-button" data-toggle="tracks.${i}.steps.${n}.${key}" aria-label="${label}, track ${i + 1}, stage ${n + 1}" aria-pressed="${!!s[key]}">${key === "slide" ? "↗" : "×"}</button>` : `<input class="lane-number" type="number" min="${key === "cv" ? (t.cvType === 1 ? 0 : -5) : min}" max="${key === "cv" ? 5 : max}" step="${key === "cv" ? ".01" : "1"}" value="${key === "cv" ? (s.cv / 1000).toFixed(2) : s[key]}" ${key === "cv" ? 'data-factor="1000"' : ""} data-path="tracks.${i}.steps.${n}.${key}" aria-label="${label}, track ${i + 1}, stage ${n + 1}">`}${key === "probability" ? button("cycle-sub", s.probabilityTarget ? "PULSE" : "STAGE", `data-track="${i}" data-stage="${n}" data-key="probabilityTarget" data-max="1"`, "lane-mode") : key === "accumulate" ? button("cycle-sub", ["STAGE", "PULSE", "RATCH"][s.accumulateTrigger], `data-track="${i}" data-stage="${n}" data-key="accumulateTrigger" data-max="2"`, "lane-mode") : key === "cv" ? (t.cvType === 2 ? button("cv-gate", s.cvGate ? "GATE ●" : "GATE ○", `data-track="${i}" data-stage="${n}"`, "lane-mode") : button("cycle-sub", ["STEP", "sRAMP", "pRAMP"][s.cvRamp], `data-track="${i}" data-stage="${n}" data-key="cvRamp" data-max="2"`, "lane-mode")) : key === "pitchOverride" ? button("sync-pitch", "SYNC", `data-track="${i}" data-stage="${n}"`, "lane-mode") : key === "gateOverride" ? `<small class="subtle mono" style="font-size:8px">${s.gateOverride < 0 ? "TRACK" : s.gateOverride === 0 ? "REST" : s.gateOverride === 100 ? "HOLD" : s.gateOverride + "%"}</small>` : ""}</div>`).join("")}</div></div>`;
 }
 function miniGraph(lane) {
   const values = lane.steps.map((s) =>
@@ -449,7 +449,7 @@ function modulationView() {
     "CLOCK",
     `${pre}.division`,
     range(1, 64, (n) => `÷${n}`),
-  )}</div><div class="bank-scroll" data-scroll="mod-bank"><div class="mod-bank">${m.steps.map((s, n) => `<div class="mod-stage" data-mod-stage="${view.mod}-${n}"><span>${String(n + 1).padStart(2, "0")}</span>${gated ? `<button class="gate-pad" data-toggle="${pre}.steps.${n}.gate" aria-label="Gate MOD ${view.mod + 1}, стадия ${n + 1}" aria-pressed="${!!s.gate}">${s.gate ? "●" : "○"}</button>` : `<input type="range" min="${m.cvType === 1 ? 0 : -5000}" max="5000" step="10" value="${s.value}" data-path="${pre}.steps.${n}.value" aria-label="MOD ${view.mod + 1}, стадия ${n + 1}">`}<input class="mod-value" type="number" min="${m.cvType === 1 ? 0 : -5}" max="5" step=".01" value="${(s.value / 1000).toFixed(2)}" data-factor="1000" data-path="${pre}.steps.${n}.value" aria-label="Вольты MOD ${view.mod + 1}, стадия ${n + 1}"><button class="ramp-button" data-toggle="${pre}.steps.${n}.ramp" aria-pressed="${!!s.ramp}" aria-label="Ramp MOD ${view.mod + 1}, стадия ${n + 1}">${s.ramp ? "RAMP ↗" : "STEP —"}</button></div>`).join("")}</div></div><div class="mod-bottom">${control(
+  )}</div><div class="bank-scroll" data-scroll="mod-bank"><div class="mod-bank">${m.steps.map((s, n) => `<div class="mod-stage" data-mod-stage="${view.mod}-${n}"><span>${String(n + 1).padStart(2, "0")}</span>${gated ? `<button class="gate-pad" data-toggle="${pre}.steps.${n}.gate" aria-label="Gate MOD ${view.mod + 1}, stage ${n + 1}" aria-pressed="${!!s.gate}">${s.gate ? "●" : "○"}</button>` : `<input type="range" min="${m.cvType === 1 ? 0 : -5000}" max="5000" step="10" value="${s.value}" data-path="${pre}.steps.${n}.value" aria-label="MOD ${view.mod + 1}, stage ${n + 1}">`}<input class="mod-value" type="number" min="${m.cvType === 1 ? 0 : -5}" max="5" step=".01" value="${(s.value / 1000).toFixed(2)}" data-factor="1000" data-path="${pre}.steps.${n}.value" aria-label="MOD voltage ${view.mod + 1}, stage ${n + 1}"><button class="ramp-button" data-toggle="${pre}.steps.${n}.ramp" aria-pressed="${!!s.ramp}" aria-label="Ramp MOD ${view.mod + 1}, stage ${n + 1}">${s.ramp ? "RAMP ↗" : "STEP —"}</button></div>`).join("")}</div></div><div class="mod-bottom">${control(
     "OFFSET",
     `${pre}.offset`,
     range(0, 15, (n) => `+${n}`),
@@ -462,7 +462,7 @@ function performanceView() {
     view.auditionTrack,
     trackOptions(),
     "Stage player track",
-  )}${control("TARGET", "loopy.target", targetOptions())}${control("PULSES", "loopy.pulses", [[0, "Auto"], ...range(1, 64)])}${toggle("LATCH", "loopy.latch")}</div><div class="loopy-pads">${Array.from({ length: 16 }, (_, i) => button("pad", String(i + 1).padStart(2, "0"), `data-track="${view.auditionTrack}" data-stage="${i}" aria-label="Играть стадию ${i + 1}, трек ${view.auditionTrack + 1}"`)).join("")}</div></div></section><section class="tool-panel"><div class="tool-heading"><h2>CTRL</h2><small>PERFORMANCE CONTROLS</small></div><div class="tool-body controller-grid">${p.controls
+  )}${control("TARGET", "loopy.target", targetOptions())}${control("PULSES", "loopy.pulses", [[0, "Auto"], ...range(1, 64)])}${toggle("LATCH", "loopy.latch")}</div><div class="loopy-pads">${Array.from({ length: 16 }, (_, i) => button("pad", String(i + 1).padStart(2, "0"), `data-track="${view.auditionTrack}" data-stage="${i}" aria-label="Play stage ${i + 1}, track ${view.auditionTrack + 1}"`)).join("")}</div></div></section><section class="tool-panel"><div class="tool-heading"><h2>CTRL</h2><small>PERFORMANCE CONTROLS</small></div><div class="tool-body controller-grid">${p.controls
     .map(
       (r, i) =>
         `<div class="controller"><label class="knob-wrap"><span class="knob" data-knob="${i}" style="--rotation:${(r.value / 5000) * 135}deg"></span><input type="range" min="-5000" max="5000" step="10" data-path="controls.${i}.value" value="${store.pickup.get("control:" + i)?.physical ?? r.value}" aria-label="CTRL ${i + 1}"><output data-readout="controls.${i}.value">${voltage(r.value)}</output></label><div class="controller-routing">${control(
@@ -519,7 +519,7 @@ function performanceView() {
     "EXT CLOCK DIV",
     "settings.externalDivision",
     range(1, 256, (n) => `÷${n}`),
-  )}${control("RESET INPUT", "settings.resetInput", options(["Reset", "Run + reset", "Run / continue"]))}</div><div class="action-row" style="margin-top:20px">${button("clock-in", "CLK IN", 'aria-label="Внешний clock pulse"')}${button("reset-in", "RESET IN", 'aria-label="Внешний reset / run"')}${select(
+  )}${control("RESET INPUT", "settings.resetInput", options(["Reset", "Run + reset", "Run / continue"]))}</div><div class="action-row" style="margin-top:20px">${button("clock-in", "CLK IN", 'aria-label="External clock pulse"')}${button("reset-in", "RESET IN", 'aria-label="External reset / run"')}${select(
     "@tuneNote",
     view.tuneNote ?? 48,
     range(0, 10, (n) => noteName(n * 12)).map(([id, name]) => [id * 12, name]),
@@ -529,7 +529,7 @@ function performanceView() {
 function presetsView() {
   const s = store.session,
     p = store.patch;
-  return `<div class="section-heading"><div><h1>Presets & chains</h1><p>64 presets · 8 banks · up to 32 links per chain.</p></div><div class="actions">${button("export-backup", icon("download") + "Backup")}${button("import", icon("folder") + "Import")}</div></div><div class="presets-layout"><section><div class="preset-toolbar">${control("LOAD DELAY", "settings.loadMode", options(["Instant", "Queue pulses", "Global cycle"]))}${control("QUEUE PULSES", "settings.queuePulses", null, { min: 0, max: 4096 })}</div><div class="bank-tabs" aria-label="Банки пресетов">${range(
+  return `<div class="section-heading"><div><h1>Presets & chains</h1><p>64 presets · 8 banks · up to 32 links per chain.</p></div><div class="actions">${button("export-backup", icon("download") + "Backup")}${button("import", icon("folder") + "Import")}</div></div><div class="presets-layout"><section><div class="preset-toolbar">${control("LOAD DELAY", "settings.loadMode", options(["Instant", "Queue pulses", "Global cycle"]))}${control("QUEUE PULSES", "settings.queuePulses", null, { min: 0, max: 4096 })}</div><div class="bank-tabs" aria-label="Preset banks">${range(
     0,
     7,
   )
@@ -537,7 +537,7 @@ function presetsView() {
       button(
         "preset-bank",
         String(i + 1),
-        `data-bank="${i}" aria-label="Банк ${i + 1}"`,
+        `data-bank="${i}" aria-label="Bank ${i + 1}"`,
         view.bank === i ? "active" : "",
       ),
     )
@@ -547,15 +547,15 @@ function presetsView() {
   )
     .map(
       ([i]) =>
-        `<div class="preset-slot ${!s.presets[i] ? "empty" : ""} ${s.currentPreset === i ? "loaded" : ""} ${runtime.queued === i ? "queued" : ""}" role="button" tabindex="0" data-action="preset-load" data-slot="${i}" aria-label="Загрузить пресет ${bankSlot(i)}${s.presets[i] ? ": " + escape(s.presets[i].name) : ", пусто"}"><span class="slot-index">${bankSlot(i)} ${runtime.queued === i ? "QUEUED" : ""}</span><span class="slot-name">${s.presets[i] ? escape(s.presets[i].name) : "Empty"}</span><div class="slot-actions">${iconButton("preset-save", "save", `Сохранить в ${bankSlot(i)}`, `data-slot="${i}" ${runtime.chainEnabled || runtime.queued !== null ? "disabled" : ""}`)}${s.presets[i] ? iconButton("preset-clear", "trash", `Очистить ${bankSlot(i)}`, `data-slot="${i}" ${runtime.chainEnabled || runtime.queued !== null ? "disabled" : ""}`) : ""}</div></div>`,
+        `<div class="preset-slot ${!s.presets[i] ? "empty" : ""} ${s.currentPreset === i ? "loaded" : ""} ${runtime.queued === i ? "queued" : ""}" role="button" tabindex="0" data-action="preset-load" data-slot="${i}" aria-label="Load preset ${bankSlot(i)}${s.presets[i] ? ": " + escape(s.presets[i].name) : ", empty"}"><span class="slot-index">${bankSlot(i)} ${runtime.queued === i ? "QUEUED" : ""}</span><span class="slot-name">${s.presets[i] ? escape(s.presets[i].name) : "Empty"}</span><div class="slot-actions">${iconButton("preset-save", "save", `Save to ${bankSlot(i)}`, `data-slot="${i}" ${runtime.chainEnabled || runtime.queued !== null ? "disabled" : ""}`)}${s.presets[i] ? iconButton("preset-clear", "trash", `Clear ${bankSlot(i)}`, `data-slot="${i}" ${runtime.chainEnabled || runtime.queued !== null ? "disabled" : ""}`) : ""}</div></div>`,
     )
     .join(
       "",
-    )}</div><div class="parameter-group" style="margin-top:20px"><h3>PRESET RECALL</h3><div class="control-grid two">${control("PITCH LOAD", "settings.pitchLoad", options(["Off · keep faders", "Thru · pickup", "Jump · full recall"]))}${control("SWITCH LOAD", "settings.switchLoad", options(["Off · keep switches", "Jump · recall"]))}${control("CTRL LOAD", "settings.ctrlLoad", options(["Off", "Assignments", "Thru · pickup", "Jump"]))}${control("AUX LOAD", "settings.auxLoad", options(["Off", "Assignments"]))}</div></div></section><section><div class="section-heading" style="margin-bottom:16px"><div><h1 style="font-size:15px">Preset chain</h1></div>${button("chain-toggle", icon("link") + (runtime.chainEnabled ? "Disable chain" : "Enable chain"), `aria-pressed="${runtime.chainEnabled}" ${!s.chain.length ? "disabled" : ""}`, runtime.chainEnabled ? "active" : "")}</div><div class="chain-add">${select("@chainPreset", view.chainPreset, s.presets.map((preset, i) => (preset ? [i, `${bankSlot(i)} · ${preset.name}`] : null)).filter(Boolean), "Пресет для цепочки")}${button("chain-add", icon("plus") + "Add link", s.chain.length >= 32 || runtime.chainEnabled ? "disabled" : "")}</div><div class="chain-list">${s.chain.length ? s.chain.map((link, i) => `<div class="chain-link ${runtime.chainEnabled && runtime.chainIndex === i ? "playing" : ""}" data-chain-link="${i}"><span class="link-index">${String(i + 1).padStart(2, "0")}</span><span class="link-name">${bankSlot(link.preset)} · ${escape(s.presets[link.preset]?.name || "Current pattern")}</span><input class="field-number" type="number" min="1" max="64" value="${link.repeat}" data-chain-repeat="${i}" aria-label="Повторы звена ${i + 1}" ${runtime.chainEnabled ? "disabled" : ""}>${chainMuteMenu(link, i)}${iconButton("chain-delete", "close", `Удалить звено ${i + 1}`, `data-index="${i}" ${runtime.chainEnabled ? "disabled" : ""}`)}</div>`).join("") : '<div class="chain-empty">Add a preset to build the arrangement.<br>Each link has its own repeats and mute states.</div>'}</div><div class="chain-saved"><span>CHAIN MEMORY</span>${Array.from({ length: 8 }, (_, i) => button("chain-load", String(i + 1), `data-index="${i}" aria-label="Загрузить цепочку ${i + 1}" ${!s.chains[i] || runtime.chainEnabled ? "disabled" : ""}`, s.chains[i] ? "active" : "")).join("")}${select(
+    )}</div><div class="parameter-group" style="margin-top:20px"><h3>PRESET RECALL</h3><div class="control-grid two">${control("PITCH LOAD", "settings.pitchLoad", options(["Off · keep faders", "Thru · pickup", "Jump · full recall"]))}${control("SWITCH LOAD", "settings.switchLoad", options(["Off · keep switches", "Jump · recall"]))}${control("CTRL LOAD", "settings.ctrlLoad", options(["Off", "Assignments", "Thru · pickup", "Jump"]))}${control("AUX LOAD", "settings.auxLoad", options(["Off", "Assignments"]))}</div></div></section><section><div class="section-heading" style="margin-bottom:16px"><div><h1 style="font-size:15px">Preset chain</h1></div>${button("chain-toggle", icon("link") + (runtime.chainEnabled ? "Disable chain" : "Enable chain"), `aria-pressed="${runtime.chainEnabled}" ${!s.chain.length ? "disabled" : ""}`, runtime.chainEnabled ? "active" : "")}</div><div class="chain-add">${select("@chainPreset", view.chainPreset, s.presets.map((preset, i) => (preset ? [i, `${bankSlot(i)} · ${preset.name}`] : null)).filter(Boolean), "Preset for chain")}${button("chain-add", icon("plus") + "Add link", s.chain.length >= 32 || runtime.chainEnabled ? "disabled" : "")}</div><div class="chain-list">${s.chain.length ? s.chain.map((link, i) => `<div class="chain-link ${runtime.chainEnabled && runtime.chainIndex === i ? "playing" : ""}" data-chain-link="${i}"><span class="link-index">${String(i + 1).padStart(2, "0")}</span><span class="link-name">${bankSlot(link.preset)} · ${escape(s.presets[link.preset]?.name || "Current pattern")}</span><input class="field-number" type="number" min="1" max="64" value="${link.repeat}" data-chain-repeat="${i}" aria-label="Link repeats ${i + 1}" ${runtime.chainEnabled ? "disabled" : ""}>${chainMuteMenu(link, i)}${iconButton("chain-delete", "close", `Remove link ${i + 1}`, `data-index="${i}" ${runtime.chainEnabled ? "disabled" : ""}`)}</div>`).join("") : '<div class="chain-empty">Add a preset to build the arrangement.<br>Each link has its own repeats and mute states.</div>'}</div><div class="chain-saved"><span>CHAIN MEMORY</span>${Array.from({ length: 8 }, (_, i) => button("chain-load", String(i + 1), `data-index="${i}" aria-label="Load chain ${i + 1}" ${!s.chains[i] || runtime.chainEnabled ? "disabled" : ""}`, s.chains[i] ? "active" : "")).join("")}${select(
     "@chainSlot",
     view.chainSlot,
     range(0, 7, (n) => "Slot " + (n + 1)),
-    "Слот цепочки",
+    "Chain slot",
   )}${button("chain-save", "Save", runtime.chainEnabled ? "disabled" : "")}</div></section></div>`;
 }
 function scalesView() {
@@ -573,7 +573,7 @@ function scalesView() {
       button(
         "scale-bank",
         String(i + 1),
-        `data-bank="${i}" aria-label="Банк ладов ${i + 1}"`,
+        `data-bank="${i}" aria-label="Scale bank ${i + 1}"`,
         view.scaleBank === i ? "active" : "",
       ),
     )
@@ -588,7 +588,7 @@ function scalesView() {
     )
     .join(
       "",
-    )}</div></aside><section class="scale-editor"><div class="scale-heading"><input class="scale-name" maxlength="60" data-path="userScales.${index}.name" aria-label="Имя пользовательского лада" value="${escape(s.name)}">${control("ROOT", `userScales.${index}.root`, options(NOTES))}</div><div class="piano" aria-label="Ноты пользовательского лада">${NOTES.map((note, n) => button("scale-note", note, `data-scale-note="${n}" aria-label="${note}" aria-pressed="${!!(s.mask & (1 << n))}"`, [1, 3, 6, 8, 10].includes(n) ? "black" : "")).join("")}</div><div class="scale-metadata"><span>${notes.length} NOTES</span><span>${notes.map((n) => NOTES[(n + s.root) % 12]).join(" · ") || "CHROMATIC FALLBACK"}</span></div><div class="action-row">${select("@scaleTrack", view.scaleTrack || 0, trackOptions(), "Трек для лада")}${button("scale-assign-selected", "Use on track")}${button("scale-assign-all", "Use on all")}${button("scale-from-factory", "Copy current factory scale", "", "ghost")}</div></section></div>`;
+    )}</div></aside><section class="scale-editor"><div class="scale-heading"><input class="scale-name" maxlength="60" data-path="userScales.${index}.name" aria-label="User scale name" value="${escape(s.name)}">${control("ROOT", `userScales.${index}.root`, options(NOTES))}</div><div class="piano" aria-label="User scale notes">${NOTES.map((note, n) => button("scale-note", note, `data-scale-note="${n}" aria-label="${note}" aria-pressed="${!!(s.mask & (1 << n))}"`, [1, 3, 6, 8, 10].includes(n) ? "black" : "")).join("")}</div><div class="scale-metadata"><span>${notes.length} NOTES</span><span>${notes.map((n) => NOTES[(n + s.root) % 12]).join(" · ") || "CHROMATIC FALLBACK"}</span></div><div class="action-row">${select("@scaleTrack", view.scaleTrack || 0, trackOptions(), "Track for scale")}${button("scale-assign-selected", "Use on track")}${button("scale-assign-all", "Use on all")}${button("scale-from-factory", "Copy current factory scale", "", "ghost")}</div></section></div>`;
 }
 function setupView() {
   const p = store.patch;
@@ -605,7 +605,7 @@ function setupContent() {
   const p = store.patch;
   if (view.setup === "automation" && runtime.hosted) {
     const lanes = pluginState(store.session).automation;
-    return `<div class="parameter-group"><h2>DAW automation</h2><p class="drawer-note">Reset after, Preset и Chain доступны в DAW напрямую. Для остальных параметров нажми Learn и измени нужный регулятор.</p><div class="automation-list">${Array.from({ length: AUTOMATION_LANES }, (_, i) => `<div class="automation-row"><span class="automation-index">${String(i + 1).padStart(2, "0")}</span><span class="automation-target" title="${escape(lanes[i])}">${escape(automationLabel(lanes[i]))}</span>${button("automation-learn", runtime.automationLearn === i ? "Learning…" : "Learn", `data-index="${i}" aria-pressed="${runtime.automationLearn === i}" aria-label="Назначить Automation ${i + 1}"`, runtime.automationLearn === i ? "active" : "ghost")}${iconButton("automation-clear", "close", `Очистить Automation ${i + 1}`, `data-index="${i}" ${lanes[i] ? "" : "disabled"}`)}</div>`).join("")}</div></div>`;
+    return `<div class="parameter-group"><h2>DAW automation</h2><p class="drawer-note">Reset after, Preset and Chain are available directly in your DAW. For other parameters, press Learn and adjust a control.</p><div class="automation-list">${Array.from({ length: AUTOMATION_LANES }, (_, i) => `<div class="automation-row"><span class="automation-index">${String(i + 1).padStart(2, "0")}</span><span class="automation-target" title="${escape(lanes[i])}">${escape(automationLabel(lanes[i]))}</span>${button("automation-learn", runtime.automationLearn === i ? "Learning…" : "Learn", `data-index="${i}" aria-pressed="${runtime.automationLearn === i}" aria-label="Assign Automation ${i + 1}"`, runtime.automationLearn === i ? "active" : "ghost")}${iconButton("automation-clear", "close", `Clear Automation ${i + 1}`, `data-index="${i}" ${lanes[i] ? "" : "disabled"}`)}</div>`).join("")}</div></div>`;
   }
   if (view.setup === "global")
     return `<div class="parameter-group"><h2>Clock</h2><div class="control-grid">${control("SOURCE", "settings.clockSource", options(["Internal", "External CLK", "MIDI"]))}${control("EXT CLOCK DIV", "settings.externalDivision", null, { min: 1, max: 256 })}${control("CLOCK / RESET OUT", "settings.clockMode", options(["Always", "While running"]))}${control("RESET INPUT", "settings.resetInput", options(["Reset", "Run + reset", "Run / continue"]))}${control("CLOCK OUT DIV", "settings.outputDivision", null, { min: 1, max: 256 })}${control("CLOCK OUT OFFSET", "settings.outputOffset", null, { min: 0, max: p.settings.outputDivision - 1 })}${control("RUN BUTTON", "settings.runMode", options(["Run / Pause", "Run / Stop"]))}</div></div><div class="parameter-group"><h2>Outputs & display</h2><div class="control-grid">${control("CV / GATE DELAY · MS", "settings.cvDelay", null, { min: 0, max: 21 })}${control("LED LEVEL", "settings.ledLevel", range(1, 4))}${control("DISPLAY LEVEL", "settings.screenLevel", range(1, 4))}</div></div><div class="action-row">${button("reset", "Reset all tracks")}${button("panic", "All notes off")}</div>`;
@@ -646,7 +646,7 @@ function renderDrawer() {
     `<div class="parameter-group"><h3>${name}</h3><div class="control-grid two">${body}</div></div>`;
   if (view.drawerTab === "timing")
     content =
-      `<label class="control track-name"><span>NAME</span><input class="field-number" maxlength="60" data-path="${pre}.name" value="${escape(t.name)}" aria-label="Имя трека ${i + 1}"></label>` +
+      `<label class="control track-name"><span>NAME</span><input class="field-number" maxlength="60" data-path="${pre}.name" value="${escape(t.name)}" aria-label="Track name ${i + 1}"></label>` +
       group(
         "PLAYBACK",
         control(
@@ -867,7 +867,7 @@ function renderDrawer() {
         "@stage",
         n,
         range(0, 15, (n) => "Stage " + String(n + 1).padStart(2, "0")),
-        "Редактируемая стадия",
+        "Selected stage",
       )}</div>` +
       group(
         "STAGE " + String(n + 1).padStart(2, "0"),
@@ -916,7 +916,7 @@ function renderDrawer() {
       ) +
       `<div class="action-row">${button("copy-stage", icon("copy") + "Copy stage", `data-track="${i}" data-stage="${n}"`)}${button("paste-stage", icon("paste") + "Paste stage", `data-track="${i}" data-stage="${n}"`)}${button("sync-pitch", "Sync pitch to fader", `data-track="${i}" data-stage="${n}"`)}</div>`;
   }
-  el.innerHTML = `<div class="drawer-backdrop" data-dismiss="true"><aside class="drawer" role="dialog" aria-modal="true" aria-label="Настройки трека ${i + 1}" data-track="${i}"><header class="drawer-heading"><h2>Track ${i + 1} / ${escape(t.name)}</h2>${iconButton("drawer-close", "close", "Закрыть настройки")}</header><div class="drawer-tabs">${tabs.map(([id, label]) => button("drawer-tab", label, `data-page="${id}"`, view.drawerTab === id ? "active" : "")).join("")}</div>${view.drawerTab !== "midi" ? `<div class="action-row drawer-random">${button("settings-random", icon("random") + "Randomize")}${button("settings-morph", icon("morph") + "Morph")}${button("settings-revert", "Restore", view.randomSnapshots.has(randomGroup("settings", i).id) ? "" : "disabled")}</div>` : ""}${content}</aside></div>`;
+  el.innerHTML = `<div class="drawer-backdrop" data-dismiss="true"><aside class="drawer" role="dialog" aria-modal="true" aria-label="Track settings ${i + 1}" data-track="${i}"><header class="drawer-heading"><h2>Track ${i + 1} / ${escape(t.name)}</h2>${iconButton("drawer-close", "close", "Close settings")}</header><div class="drawer-tabs">${tabs.map(([id, label]) => button("drawer-tab", label, `data-page="${id}"`, view.drawerTab === id ? "active" : "")).join("")}</div>${view.drawerTab !== "midi" ? `<div class="action-row drawer-random">${button("settings-random", icon("random") + "Randomize")}${button("settings-morph", icon("morph") + "Morph")}${button("settings-revert", "Restore", view.randomSnapshots.has(randomGroup("settings", i).id) ? "" : "disabled")}</div>` : ""}${content}</aside></div>`;
 }
 function refreshOwnedDisplays() {
   const tempo = document.querySelector('[data-path="tempo"]');
@@ -1825,7 +1825,7 @@ async function action(el, event) {
       localStorage.getItem("metropolix-16-independent-v1"),
     );
     const patch = migratePatch(old);
-    if (!validatePatch(patch)) throw Error("Предыдущий паттерн повреждён");
+    if (!validatePatch(patch)) throw Error("The previous pattern is invalid");
     runtime.stop();
     runtime.chainEnabled = false;
     store.replace(patch);
@@ -2202,8 +2202,8 @@ function paintFrame(frame) {
     const pulse = Math.floor(frame.cycleTicks / 24) + 1;
     position.textContent = `${String(pulse).padStart(2, "0")} / ${p.totalPulses || "∞"}`;
     position.title = p.totalPulses
-      ? `Глобальный шаг ${pulse} из ${p.totalPulses}`
-      : `Глобальный шаг ${pulse} · автоматический сброс выключен`;
+      ? `Global step ${pulse} of ${p.totalPulses}`
+      : `Global step ${pulse} · automatic reset off`;
     document
       .querySelector(".cycle-length")
       ?.style.setProperty(
@@ -2323,7 +2323,7 @@ async function boot() {
       fetch("engine.wasm"),
       fetch("catalog.json"),
     ]);
-    if (!wasm.ok || !res.ok) throw Error("Файлы движка не найдены");
+    if (!wasm.ok || !res.ok) throw Error("Engine files could not be loaded");
     catalog = await res.json();
     const module = await WebAssembly.compile(await wasm.arrayBuffer());
     runtime = pluginBridge

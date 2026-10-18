@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.2.2
+
+- Native Windows x64 VST3 with WebView2 editor, an installer and a portable VST3 ZIP.
+- English is the default UI, installer and documentation language; Russian guides remain available separately.
+- Silent VST3 integration checks for MIDI channels, sample offsets, transport stop and project state.
+- Windows CI verifies native builds and installer installation/uninstallation.
+
 ## 0.2.1
 
 - Independent accumulator reset period per track: **Accum → Reset → After stages**, 1–1024 stages. Pulse Count and ratchet do not advance this counter.

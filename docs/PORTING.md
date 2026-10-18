@@ -1,28 +1,30 @@
-# Происхождение и проверка музыкального ядра
+# Musical engine provenance and validation
 
-Neuropolis начался с исследования поведения музыкальных примитивов Intellijel Metropolix 1.6.5.0. Квантайзер, генераторы порядка обхода, генератор случайных чисел и аккумулятор переписаны на Rust. Компьютерный транспорт, расширение до 16 стадий, динамический список треков, GUI и оболочка плагина реализованы отдельно.
+**English** · [Русский](PORTING.ru.md)
 
-Оригинальная прошивка не исполняется при работе Neuropolis, не входит в установщик и не нужна для обычной сборки. Проект не является полным эмулятором платы STM32.
+Neuropolis began with research into musical primitives from Intellijel Metropolix 1.6.5.0. The quantizer, traversal generators, random generator and accumulator were rewritten in Rust. Computer transport, 16-stage extension, dynamic tracks, UI and plugin wrappers were implemented separately.
 
-## Поведенческие эталоны
+Original firmware is not executed by Neuropolis, is not included in installers and is not required for ordinary builds. This is not a complete STM32 board emulator.
 
-Тесты `crates/metropolix-core/tests/firmware_equivalence.rs` и `accumulator_equivalence.rs` используют сохранённые входы/выходы выполнения исходных ARM-примитивов через Unicorn:
+## Behavioral fixtures
 
-- 62 636 случаев квантайзера;
-- 1 344 трассы порядка обхода по 128 продвижений;
-- 1 280 трасс аккумулятора по 64 события.
+`crates/metropolix-core/tests/firmware_equivalence.rs` and `accumulator_equivalence.rs` compare against saved input/output from original ARM primitives executed through Unicorn:
 
-Параметры генерации и контрольные суммы TSV находятся в [fixtures/provenance.json](../crates/metropolix-core/tests/fixtures/provenance.json). Это музыкальные данные тестов, а не код прошивки. Примитивы при создании трасс не подменялись заглушками. Сравнения подтверждают указанные наборы входов, а не всю прошивку или все возможные музыкальные сценарии.
+- 62,636 quantizer cases;
+- 1,344 traversal traces with 128 advances each;
+- 1,280 accumulator traces with 64 events each.
 
-## Источники исследования
+Generation parameters and TSV checksums are in [fixtures/provenance.json](../crates/metropolix-core/tests/fixtures/provenance.json). These are musical test data, not firmware code. The tested primitives were not stubbed during trace generation. Comparisons validate the sampled input sets, not the complete firmware or every possible musical scenario.
 
-- [Официальный репозиторий прошивок Intellijel, закреплённый commit](https://github.com/intellijel/firmware/tree/cf1754695cc291dbf35ee4bff118deb8ad69e7dd).
-- SHA-256 исследованного образа: `742b22522255f8367b94d686d92acedb891edde682b8922c1000f0ab3db29304`.
-- [CMSIS Device F4, закреплённый commit](https://github.com/STMicroelectronics/cmsis-device-f4/tree/9192c7b9df75a142f2027ab266601fe061fc00b3) — справочные определения STM32.
+## Research references
 
-В репозитории сохранены необязательные скрипты получения исходных справочных материалов и повторного исследования. Сами загруженные образы, декомпиляция и локальные отчёты исключены из Git. Условия использования каждого внешнего материала определяются его владельцем.
+- [Official Intellijel firmware repository, pinned commit](https://github.com/intellijel/firmware/tree/cf1754695cc291dbf35ee4bff118deb8ad69e7dd).
+- Researched image SHA-256: `742b22522255f8367b94d686d92acedb891edde682b8922c1000f0ab3db29304`.
+- [CMSIS Device F4, pinned commit](https://github.com/STMicroelectronics/cmsis-device-f4/tree/9192c7b9df75a142f2027ab266601fe061fc00b3), used as an STM32 reference.
 
-Для обычной сборки и запуска тестов эти материалы не нужны. Если требуется пересоздать ARM-эталоны, сначала получите закреплённые справочные файлы:
+Optional acquisition/research scripts are retained. Downloaded images, decompilation and local reports are excluded from Git. Third-party reference materials retain their owners' licensing terms. None are needed for normal builds or tests.
+
+To regenerate the ARM fixtures, acquire the pinned reference files first:
 
 ```sh
 python3 scripts/download_firmware.py
@@ -31,4 +33,4 @@ python3 -m venv .venv
 .venv/bin/python scripts/generate_oracle_fixtures.py
 ```
 
-Ghidra используется только для необязательного статического исследования (`scripts/decompile.sh`); Rust-сборка от неё не зависит.
+Ghidra is used only for optional static research through `scripts/decompile.sh`; ordinary Rust builds do not depend on it.

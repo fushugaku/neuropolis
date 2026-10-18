@@ -18,6 +18,7 @@ target/
 
 # Native plug-in build artifacts and pinned SDK cache
 /plugin/build/
+/plugin/build-windows/
 /plugin/generated/
 /tools/plugin-sdk/
 /dist/

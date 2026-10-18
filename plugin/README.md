@@ -1,52 +1,64 @@
 # neuropolis AU / VST3
 
-MIDI-секвенсор для DAW. Сборка: macOS Apple Silicon, AU MIDI FX для Logic и VST3 для других совместимых хостов. Native Rust исполняет тот же секвенсор, что и браузерная версия; JUCE предоставляет оболочку плагина и локальный WebKit-редактор. Для работы плагина локальный веб-сервер не нужен.
+**English** · [Русский](README.ru.md)
 
-## Установка и Logic
+A native Rust MIDI sequencer with a JUCE wrapper and local editor. The DAW provides tempo and transport; the instrument after neuropolis generates sound. No local server is required, and native playback does not use WASM.
 
-Скачать `neuropolis-0.2.1-macos-arm64.pkg` из [GitHub Releases](https://github.com/fushugaku/neuropolis/releases/latest) и открыть его. Стандартный мастер macOS позволяет выбрать AU, VST3 или оба формата и устанавливает их для текущего пользователя в `~/Library/Audio/Plug-Ins/{Components,VST3}`. Пакет предназначен для Apple Silicon; целевая версия macOS — 11.0 и новее. Проверка на этой машине выполнена в macOS 26.
+## Install
 
-Локальный пакет пока без Developer ID Installer и notarization; сами плагины подписаны ad-hoc. Для распространения подписанной сборки нужны сертификаты Apple. Скрипт упаковки принимает `NEUROPOLIS_APPLICATION_SIGN_IDENTITY` для подписи плагинов и `NEUROPOLIS_INSTALLER_SIGN_IDENTITY` для подписи `.pkg`.
+Get the latest packages from [GitHub Releases](https://github.com/fushugaku/neuropolis/releases/latest).
 
-Установка из исходников также доступна через `sh scripts/install_plugin.sh` или `Install Neuropolis.command`. Для обновления сборки сначала запустить `sh scripts/build_plugin.sh`.
+- **macOS 11+ / Apple Silicon:** open the `.pkg`, select AU MIDI FX, VST3, or both. Installation is per user in `~/Library/Audio/Plug-Ins/{Components,VST3}`.
+- **Windows 10/11 x64:** run the `-windows-x64-setup.exe` installer. It installs `neuropolis.vst3` in `C:\Program Files\Common Files\VST3` and provides an uninstaller. If WebView2 Runtime is absent, setup downloads and installs it from Microsoft. Internet access is needed for that step.
+- **Windows manual installation:** extract the VST3 ZIP and copy the entire `neuropolis.vst3` directory to the host's VST3 folder. Install [Microsoft Edge WebView2 Runtime](https://developer.microsoft.com/en-us/microsoft-edge/webview2/) separately if needed.
 
-После обновления списка плагинов в Logic выбрать на Software Instrument дорожке **MIDI FX → Audio Units → Neuropolis → neuropolis**, затем инструмент, например Alchemy. Tempo, Run/Stop и позиция поступают из DAW. При старте и переносе курсора секвенсор начинается заново; остановка освобождает сгенерированные ноты. Reset after задаёт свой глобальный цикл.
+Restart the DAW after installation. Packages currently have no Developer ID/notarization or Windows Authenticode signature. macOS plugin bundles are signed ad-hoc; system download protection may ask you to approve the installer. Use the SHA-256 files to verify downloads.
 
-Auto в MIDI channel назначает трекам каналы 1–16 по кругу. В одном экземпляре все ноты поступают в следующий инструмент этой дорожки. Для отдельных инструментов Logic использовать несколько экземпляров или многотембральный инструмент с маршрутизацией MIDI-каналов.
+The sequencer is native on both systems. Only the editor uses WebKit on macOS or WebView2 on Windows. Do not delete or replace the browser runtime while the DAW is running.
 
-File menu позволяет сохранить восемь тактов MIDI/JSON и загрузить паттерны/backup браузерной версии. Сохранённый `.mid` можно перетащить из Finder в DAW. Для записи живого MIDI-выхода в Logic используется пункт **Record MIDI to Track Here** в меню MIDI FX после neuropolis. Данные каждого экземпляра, включая паттерн, пресеты и лады, сохраняются в состоянии плагина внутри проекта DAW; браузерная сессия остаётся отдельной.
+## Host setup and MIDI routing
 
-## Нативные функции
+In Logic, choose **MIDI FX → Audio Units → Neuropolis → neuropolis** on a Software Instrument track, then load an instrument after it. Use **Record MIDI to Track Here** after neuropolis to record its MIDI output.
 
-Независимые треки без фиксированного предела, Pitch/Pulse Count/Gate Type и все per-stage параметры, порядок/длина/делители/swing/ratchet/вероятность/аккумулятор, квантайзер, MOD/CTRL/AUX, Loopy, глобальный сброс, пресеты, цепочки, MIDI notes/CC, live edit и импорт/экспорт работают в плагине. MX отправляет CC 102–109 или ноты 35–42 на выбранном канале; смена маршрута и остановка освобождают выходы.
+In VST3 hosts, route neuropolis MIDI output to an instrument using the host's MIDI routing controls. The host must support MIDI output from VST3 effects. The plugin has no audio input/output; sound comes from the receiving instrument. AU is available only on macOS.
 
-CLOCK каждого трека включает **÷0.5** и **÷0.25** — ускорение в 2 и 4 раза относительно ÷1. Дробные делители сохраняются в пресетах и проекте DAW, учитываются при MIDI-экспорте и доступны через Automation Learn.
+In **Setup → MIDI**, Auto assigns channels 1–16 in a repeating cycle. Explicit channels 1–16 can be assigned independently. Give two tracks the same channel to combine them into one timbre of a multitimbral instrument such as Rustias. Give the receiving timbre the same channel; use Poly voice mode for overlapping notes.
 
-В настройках трека **Accum → Reset → After stages** задаёт период аккумулятора: **Reset after · Stages** от 1 до 1024. Одна единица — вход в одну стадию с Pitch/Gate; Pulse Count и ratchet не добавляют шагов. После N стадий накопление сбрасывается перед следующей стадией, затем счёт повторяется. Счётчик независим у каждого трека и действует для Per stage и Whole track. Пропущенные стадии не считаются; пауза ноты, mute и вероятность не останавливают продвижение счётчика. Ручной Reset accumulator начинает отсчёт заново. Старые паттерны сохраняют прежний режим сброса; значение нового периода по умолчанию — 16.
+DAW start and timeline seek reset the sequencer; stopping releases generated notes. Incoming MIDI is passed through with sample offsets. Root control from incoming notes has not been added to the plugin.
 
-Очередь пресетов и цепочки исполняет Rust, включая работу с закрытым редактором и offline bounce. **Load delay → Queue pulses** ждёт установленного числа импульсов (или Pulse Length первого трека), **Global cycle** — границы Reset after. Один импульс соответствует 1/16 ноты. Повторы и mute каждого звена действуют независимо от сохранённого паттерна. При старте, переходе по времени и зацикливании транспорта цепочка начинается с первого звена.
+## Timing, accumulators and memory
 
-### Автоматизация
+Every track has its own sequence, length, direction, clock, swing, ratchets and accumulator. Clock includes **÷0.5** and **÷0.25**, equivalent to 2× and 4× speed. These values survive preset recall, DAW project state, MIDI export and automation.
 
-DAW видит 35 постоянных параметров:
+**Accum → Reset → After stages** resets accumulation after 1–1024 stage entries. A stage is the position with Pitch/Gate controls. Pulse Count and ratchet do not add entries. Reset happens before the next stage after N entries, then repeats. Skipped stages do not count; rest, mute and probability do not stop progression. Manual Reset accumulator restarts the count. Existing patterns retain their previous reset mode, with a default period of 16 for the new mode.
 
-- **Reset after** — 0…1024 шага, 0 выключает глобальный сброс.
-- **Preset** — 0 без запроса загрузки, 1…64 соответствуют слотам 1.1…8.8; учитывает Load delay.
-- **Chain** — запуск/выключение цепочки.
-- **Automation 01…32** — назначаемые слоты для числовых параметров треков, стадий, MOD, CTRL/AUX, выходов, MX и пользовательских ладов.
+Global **Reset after** is a separate cycle measured in sixteenth notes and resets tracks and MOD lanes. A value of 0 turns periodic global reset off.
 
-В редакторе открыть **Setup → Automation → Learn**, затем изменить нужный регулятор. В DAW выбрать соответствующий **Automation NN**. Слот отображает 0…100% диапазона назначенного параметра; дискретные значения округляются. Назначение работает с любым номером трека. Число треков не зависит от числа слотов автоматизации. Жесты фейдеров передаются хосту для Touch/Latch/Write; назначение и изменённые значения сохраняются внутри проекта. При удалении трека назначения оставшихся треков следуют за ними.
+Preset queues and chains run in Rust with the editor closed and during offline bounce. **Load delay → Queue pulses** waits for the chosen pulse count; **Global cycle** waits for Reset after. A pulse is one sixteenth note. Each chain link has its own repeats and mute state. DAW start, seek and transport looping restart the chain from its first link.
 
-Звук создаёт инструмент DAW. BPM и транспорт задаёт хост. MIDI-вход передаётся следующему инструменту; отдельное управление root входящими нотами пока не добавлено. Аппаратные входы, browser monitor voices и оригинальный firmware SysEx в AU не используются. AU проверен через auval и отдельный AU-host; VST3 собирается, отдельная проверка в другой DAW ещё не проведена.
+Pattern, presets, scales and automation assignments are saved in each plugin instance's DAW state. File menu exports JSON patterns/backups and eight bars of MIDI; drag the exported `.mid` from your file manager into the DAW. Browser session storage remains separate.
 
-## Сборка и проверки
+## Automation
 
-Нужны Rust/rustup, Node.js, CMake и macOS Command Line Tools. `sh scripts/build_plugin.sh` загружает фиксированный JUCE commit `a74b024c188339fdfe07b73088e6f6961ff66709` (8.0.16-security), собирает Web UI и Rust static library, затем AU/VST3. Изменения конфигурации подготавливаются вне render callback; на границе блока заменяется подготовленный экземпляр с переносом позиций треков. Старые экземпляры освобождаются message thread. GUI читает отдельные атомарные значения.
+The DAW sees 35 stable parameters:
 
-`sh scripts/package_plugin.sh` пересобирает плагины и создаёт `.pkg` с SHA-256 в `dist/`. Для упаковки готовой сборки: `sh scripts/package_plugin.sh --skip-build`. Последним аргументом можно указать другую выходную папку. Версия, архитектура и минимальная macOS берутся из готовых бинарников; AU и VST3 должны совпадать. Обновление атомарно заменяет выбранные bundles на фиксированных путях, без поиска одноимённых копий в других папках. Установочных скриптов, сетевых загрузок и действий с DAW в пакете нет.
+- **Reset after:** 0–1024; 0 disables global reset.
+- **Preset:** 0 means no recall request; 1–64 select slots 1.1–8.8 and respect Load delay.
+- **Chain:** starts or disables the preset chain.
+- **Automation 01–32:** assignable lanes for numeric track, stage, MOD, CTRL/AUX, output, MX and user-scale controls.
 
-`sh scripts/check_rust_port.sh` проверяет ядро и нативный renderer. `sh scripts/check_web.sh` проверяет браузерный host и plugin bridge. `auval -v aumi Nplx Npol` проверяет установленный AU. Дополнительный `NeuropolisCheck` — отдельный AU-host с темпом 123 BPM. Он проверяет host automation, сохранение значений, очередь на точном сэмпле, повторы цепочки при закрытом редакторе и round-trip состояния, затем открывает редактор. Выходные AU-пакеты читаются напрямую с временными метками; стандартный JUCE AU-host приводит входящие MIDI-события к началу блока. Результаты находятся в `analysis/plugin-host.log`.
+Open **Setup → Automation**, press Learn, then adjust the desired control. Choose the matching Automation NN in the DAW. Each lane spans 0–100% of its assigned range; discrete values are rounded. Fader gestures reach the host for Touch/Latch/Write. Removing a track updates assignments to the surviving tracks.
 
-## Зависимости
+## Build and test
 
-JUCE: [официальный репозиторий](https://github.com/juce-framework/JUCE), [лицензия](https://github.com/juce-framework/JUCE/blob/a74b024c188339fdfe07b73088e6f6961ff66709/LICENSE.md), AGPLv3 / коммерческая лицензия JUCE. Для закрытого распространения следует выбрать подходящие условия JUCE. Neuropolis публикуется под AGPL-3.0; полный текст лицензии находится в `LICENSE`, сведения о зависимостях — в `THIRD_PARTY_NOTICES.md`. Rust-ядро внешних Cargo-зависимостей не добавляет.
+Requirements are listed in the [main README](../README.md). Build with `sh scripts/build_plugin.sh` on macOS or `./scripts/build_plugin.ps1` in Windows PowerShell. The JUCE commit is pinned to `a74b024c188339fdfe07b73088e6f6961ff66709`; Windows uses WebView2 SDK `1.0.3485.44`. Windows C/C++ runtime and WebView2 loader linking is static.
+
+Package with `sh scripts/package_plugin.sh --skip-build` or `./scripts/package_plugin.ps1 -SkipBuild`. Outputs and SHA-256 files appear in `dist/`. macOS packaging accepts `NEUROPOLIS_APPLICATION_SIGN_IDENTITY` and `NEUROPOLIS_INSTALLER_SIGN_IDENTITY`. Apple notarization is a separate release step. Windows installers are currently unsigned.
+
+`NeuropolisVST3Check` loads the real VST3 without an audio device and checks generated channels, incoming MIDI sample offsets, transport stop and host-parameter state restoration. Run it through CTest after building. `NeuropolisCheck` is the separate macOS AU validation host. Run `auval -v aumi Nplx Npol` for an installed AU.
+
+Hardware analog inputs/outputs, original firmware SysEx and board peripherals are not implemented by the plugin. Virtual musical controls and the browser monitor voices are described in [Features](../docs/FEATURES.md).
+
+## License
+
+Neuropolis and the JUCE wrapper use AGPL-3.0. See [LICENSE](../LICENSE), [THIRD_PARTY_NOTICES.md](../THIRD_PARTY_NOTICES.md) and `licenses/`. Microsoft WebView2 components retain their Microsoft license terms.

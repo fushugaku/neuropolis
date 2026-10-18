@@ -611,7 +611,16 @@ class NeuropolisEditor final : public AudioProcessorEditor, private Timer {
 
   private:
     WebBrowserComponent::Options options() {
-        return WebBrowserComponent::Options()
+        auto result = WebBrowserComponent::Options();
+#if JUCE_WINDOWS
+        const auto cache = File::getSpecialLocation(File::userApplicationDataDirectory)
+                               .getChildFile("Neuropolis/WebView2");
+        cache.createDirectory();
+        result = result.withBackend(WebBrowserComponent::Options::Backend::webview2)
+                     .withWinWebView2Options(WebBrowserComponent::Options::WinWebView2()
+                                                .withUserDataFolder(cache));
+#endif
+        return result
             .withNativeIntegrationEnabled()
             .withKeepPageLoadedWhenBrowserIsHidden()
             .withInitialisationData("neuropolisSession", unit.state())

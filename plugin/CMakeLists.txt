@@ -1,14 +1,22 @@
 cmake_minimum_required(VERSION 3.22)
 set(CMAKE_OSX_DEPLOYMENT_TARGET 11.0 CACHE STRING "Minimum macOS")
-project(Neuropolis VERSION 0.2.1 LANGUAGES C CXX)
+project(Neuropolis VERSION 0.2.2 LANGUAGES C CXX)
 set(CMAKE_CXX_STANDARD 17)
+if(MSVC)
+    set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+endif()
 add_subdirectory(../tools/plugin-sdk/JUCE juce)
+set(neuropolis_formats VST3)
+if(APPLE)
+    list(PREPEND neuropolis_formats AU)
+endif()
 juce_add_plugin(Neuropolis
     COMPANY_NAME "Neuropolis" BUNDLE_ID "studio.neuropolis.midi"
     PLUGIN_MANUFACTURER_CODE Npol PLUGIN_CODE Nplx
-    FORMATS AU VST3 PRODUCT_NAME "neuropolis"
+    FORMATS ${neuropolis_formats} PRODUCT_NAME "neuropolis"
     IS_SYNTH FALSE IS_MIDI_EFFECT TRUE NEEDS_MIDI_INPUT TRUE NEEDS_MIDI_OUTPUT TRUE
-    EDITOR_WANTS_KEYBOARD_FOCUS TRUE COPY_PLUGIN_AFTER_BUILD FALSE)
+    EDITOR_WANTS_KEYBOARD_FOCUS TRUE COPY_PLUGIN_AFTER_BUILD FALSE
+    NEEDS_WEBVIEW2 TRUE)
 file(GLOB WEB_RESOURCES CONFIGURE_DEPENDS ../web/dist/*.js)
 list(APPEND WEB_RESOURCES ../web/dist/index.html ../web/dist/style.css ../web/dist/catalog.json ../web/dist/engine.wasm generated/initial.json)
 juce_add_binary_data(NeuropolisAssets SOURCES ${WEB_RESOURCES})
@@ -16,15 +24,37 @@ target_sources(Neuropolis PRIVATE Source/Plugin.cpp)
 target_include_directories(Neuropolis PRIVATE generated)
 target_compile_definitions(Neuropolis PUBLIC JUCE_WEB_BROWSER=1 JUCE_USE_CURL=0 JUCE_VST3_CAN_REPLACE_VST2=0)
 add_library(NeuropolisRust STATIC IMPORTED)
-set_target_properties(NeuropolisRust PROPERTIES IMPORTED_LOCATION "${CMAKE_CURRENT_SOURCE_DIR}/../target/release/libneuropolis_plugin.a")
+if(WIN32)
+    set(neuropolis_rust_library neuropolis_plugin.lib)
+    target_compile_definitions(Neuropolis PUBLIC JUCE_USE_WIN_WEBVIEW2_WITH_STATIC_LINKING=1)
+else()
+    set(neuropolis_rust_library libneuropolis_plugin.a)
+endif()
+set_target_properties(NeuropolisRust PROPERTIES IMPORTED_LOCATION "${CMAKE_CURRENT_SOURCE_DIR}/../target/release/${neuropolis_rust_library}")
 target_link_libraries(Neuropolis PRIVATE NeuropolisAssets NeuropolisRust
     juce::juce_audio_utils juce::juce_gui_extra
-    "-framework Security" "-framework SystemConfiguration"
     PUBLIC juce::juce_recommended_config_flags juce::juce_recommended_warning_flags)
+if(APPLE)
+    target_link_libraries(Neuropolis PRIVATE "-framework Security" "-framework SystemConfiguration")
+elseif(WIN32)
+    target_link_libraries(Neuropolis PRIVATE userenv ws2_32 bcrypt ntdll)
+endif()
 
+if(APPLE)
 juce_add_gui_app(NeuropolisCheck PRODUCT_NAME "Neuropolis Check" BUNDLE_ID "studio.neuropolis.check")
 target_sources(NeuropolisCheck PRIVATE Source/CheckHost.cpp)
 target_include_directories(NeuropolisCheck PRIVATE generated)
 target_compile_definitions(NeuropolisCheck PRIVATE JUCE_PLUGINHOST_AU=1 JUCE_WEB_BROWSER=0 JUCE_USE_CURL=0)
 target_link_libraries(NeuropolisCheck PRIVATE juce::juce_audio_utils juce::juce_gui_extra PUBLIC juce::juce_recommended_config_flags)
 target_compile_definitions(NeuropolisCheck PRIVATE NEUROPOLIS_CHECK_LOG="${CMAKE_CURRENT_SOURCE_DIR}/../analysis/plugin-host.log")
+endif()
+
+include(CTest)
+if(BUILD_TESTING)
+    juce_add_console_app(NeuropolisVST3Check PRODUCT_NAME "Neuropolis VST3 Check")
+    target_sources(NeuropolisVST3Check PRIVATE Source/VST3Check.cpp)
+    target_compile_definitions(NeuropolisVST3Check PRIVATE JUCE_PLUGINHOST_VST3=1 JUCE_WEB_BROWSER=0 JUCE_USE_CURL=0)
+    target_link_libraries(NeuropolisVST3Check PRIVATE juce::juce_audio_utils juce::juce_gui_extra PUBLIC juce::juce_recommended_config_flags)
+    add_test(NAME vst3-midi-state COMMAND NeuropolisVST3Check
+        "${CMAKE_CURRENT_BINARY_DIR}/Neuropolis_artefacts/$<CONFIG>/VST3/neuropolis.vst3")
+endif()

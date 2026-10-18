@@ -13,7 +13,7 @@ export class MidiPort {
   async connect(onMessage, onPorts) {
     if (!navigator.requestMIDIAccess)
       throw Error(
-        "Этот браузер не поддерживает Web MIDI. Используй Chrome/Edge или экспорт .mid.",
+        "This browser does not support Web MIDI. Use Chrome/Edge or export a .mid file.",
       );
     this.access = await navigator.requestMIDIAccess({ sysex: false });
     this.onMessage = onMessage;
